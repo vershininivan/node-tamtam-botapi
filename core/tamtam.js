@@ -119,7 +119,7 @@ class TamTamBot extends EventEmitter{
         const updateType = update.update_type;
         switch (updateType) {
             case 'bot_started':
-                this.emit('bot_started');
+                this.emit('bot_started', update);
                 break;
         }
     }
