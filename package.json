@@ -9,7 +9,7 @@
     "bot api"
   ],
   "scripts": {
-    "start": "node index.js"
+    "start": "node examples/testWebHook.js"
   },
   "author": "Ivan Vershinin",
   "license": "MIT",
