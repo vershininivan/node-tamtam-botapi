@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 
 // We are receiving updates at the route below!
 app.post(`/webhook`, (req, res) => {
+    console.log('Request body:', req.body);
     bot.updateHandler(req.body);
     res.sendStatus(200);
 });
