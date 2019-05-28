@@ -2,14 +2,14 @@
   "name": "node-tamtam-botapi",
   "version": "0.0.1",
   "description": "TamTam Bot API",
-  "main": "./examples/testWebHook.js",
+  "main": "./index.js",
   "directories": {},
   "keywords": [
     "tamtam",
     "bot api"
   ],
   "scripts": {
-    "start": "node examples/index.js"
+    "start": "node index.js"
   },
   "author": "Ivan Vershinin",
   "license": "MIT",
