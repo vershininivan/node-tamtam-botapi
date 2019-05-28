@@ -2,12 +2,25 @@ const TamTamWebHook = require('./webHook');
 const EventEmitter = require('eventemitter3');
 const request = require('request');
 
-const methods = {
+const _methods = {
     SEND_MESSAGE: 'sendMessage',
     GET_ALL_CHATS: 'getAllMessage',
     GET_CHAT: 'getChats',
     GET_MESSAGES: 'getMessage'
 };
+
+const _updateType = [
+    'message_callback',
+    'message_created',
+    'message_removed',
+    'message_edited',
+    'bot_added',
+    'bot_removed',
+    'user_added',
+    'user_removed',
+    'bot_started',
+    'chat_title_changed'
+];
 
 class TamTamBot extends EventEmitter{
 
@@ -36,19 +49,19 @@ class TamTamBot extends EventEmitter{
     _methodBuilder(methodName, _chatId) {
         const builder = {};
         switch (methodName) {
-            case methods.SEND_MESSAGE:
+            case _methods.SEND_MESSAGE:
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/messages`;
                 break;
-            case methods.GET_ALL_CHATS:
+            case _methods.GET_ALL_CHATS:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/chats`;
                 break;
-            case methods.GET_CHAT:
+            case _methods.GET_CHAT:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}`;
                 break;
-            case methods.GET_MESSAGES:
+            case _methods.GET_MESSAGES:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/messages`;
                 break;
@@ -103,7 +116,12 @@ class TamTamBot extends EventEmitter{
      * @param update
      */
     updateHandler(update) {
-
+        const updateType = update.update_type;
+        switch (updateType) {
+            case 'bot_started':
+                this.emit('bot_started');
+                break;
+        }
     }
 
     /**
@@ -118,7 +136,7 @@ class TamTamBot extends EventEmitter{
         form.user_id = userId;
         form.chat_id = chatId;
         form.body = body;
-        form.method = this._methodBuilder(methods.SEND_MESSAGE, chatId);
+        form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
         form.query = this._buildQuery(form);
         return this._request({form});
     }
@@ -133,7 +151,7 @@ class TamTamBot extends EventEmitter{
     getAllChats(count, marker, form = {}) {
         form.count = count;
         form.marker = marker;
-        form.method = this._methodBuilder(methods.GET_ALL_CHATS);
+        form.method = this._methodBuilder(_methods.GET_ALL_CHATS);
         form.query = this._buildQuery(form);
         return this._request({form})
     }
@@ -155,7 +173,7 @@ class TamTamBot extends EventEmitter{
         form.to = to;
         form.count = count;
         form.query = this._buildQuery(form);
-        return this._request(methods.GET_MESSAGES, {form})
+        return this._request(_methods.GET_MESSAGES, {form})
     }
 
 }

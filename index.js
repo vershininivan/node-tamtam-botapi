@@ -31,8 +31,8 @@ body.text = 'test message';
 
 bot.sendMessage(undefined, 52264184421, body);
 
-bot.getAllChats();
+bot.getAllChats(1);
 
-bot.on('message_created', msg => {
-    bot.sendMessage(undefined, msg.recipient.chat_id, body);
+bot.on('bot_started', msg => {
+    bot.sendMessage(undefined, msg.chat_id, body);
 });
