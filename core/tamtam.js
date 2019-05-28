@@ -1,4 +1,3 @@
-const TamTamWebHook = require('./webHook');
 const EventEmitter = require('eventemitter3');
 const request = require('request');
 
