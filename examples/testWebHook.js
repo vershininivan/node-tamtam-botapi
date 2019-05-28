@@ -3,25 +3,24 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const TOKEN = 'wzkaE8SrN9Nmu9I-CdSfGjnwxAdKO2CYVv8PfTGvodc';
-const url = '';
 
 const bot = new TamTamBot(TOKEN);
 
-var app = express();
+const app = express();
 
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
 // We are receiving updates at the route below!
-app.post(`/webhook`, (req, res) => {
+app.post(`/webhook2`, (req, res) => {
     bot.updateHandler(req.body);
     res.sendStatus(200);
 });
 
 // Start Express Server
-app.listen(port, () => {
-    console.log(`Express server is listening on ${port}`);
+app.listen(PORT, () => {
+    console.log(`Express server is listening on ${PORT}`);
 });
 
 let body = {};
