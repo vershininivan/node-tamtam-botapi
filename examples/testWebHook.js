@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const TOKEN = 'wzkaE8SrN9Nmu9I-CdSfGjnwxAdKO2CYVv8PfTGvodc';
+const appName = 'tamtambot';
+const path = 'webhook';
 
 const bot = new TamTamBot(TOKEN);
 
@@ -12,8 +14,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+bot.subscribe(`https://${appName}.herokuapp.com/${path}`);
+
 // We are receiving updates at the route below!
-app.post(`/webhook`, (req, res) => {
+app.post(`/${path}`, (req, res) => {
     console.log('Request body:', req.body);
     bot.updateHandler(req.body);
     res.sendStatus(200);

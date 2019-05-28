@@ -5,7 +5,8 @@ const _methods = {
     SEND_MESSAGE: 'sendMessage',
     GET_ALL_CHATS: 'getAllMessage',
     GET_CHAT: 'getChats',
-    GET_MESSAGES: 'getMessage'
+    GET_MESSAGES: 'getMessages',
+    SUBSCRIBE: 'subscribe'
 };
 
 const _updateType = [
@@ -26,6 +27,7 @@ class TamTamBot extends EventEmitter{
     constructor(token, options = {}) {
         super();
         this.token = token;
+        this.version = '0.1.6';
         this.options = options;
         this.options.baseApiUrl = 'https://botapi.tamtam.chat';
     }
@@ -64,6 +66,10 @@ class TamTamBot extends EventEmitter{
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/messages`;
                 break;
+            case _methods.SUBSCRIBE:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/subscriptions`;
+                break;
         }
         return builder;
     }
@@ -83,6 +89,7 @@ class TamTamBot extends EventEmitter{
         qs.count = form.count;
         qs.marker = form.marker;
         qs.access_token = this.token;
+        qs.v = this.version;
         return qs;
     }
 
@@ -171,8 +178,28 @@ class TamTamBot extends EventEmitter{
         form.from = from;
         form.to = to;
         form.count = count;
+        form.method = this._methodBuilder(_methods.GET_MESSAGES);
         form.query = this._buildQuery(form);
-        return this._request(_methods.GET_MESSAGES, {form})
+        return this._request({form})
+    }
+
+    /**
+     *
+     * @param url
+     * @param updateTypes
+     * @param version
+     * @param form
+     * @returns {request.Request}
+     */
+    subscribe(url, updateTypes, version, form = {}) {
+        const body = {};
+        body.url = url;
+        body.update_types = updateTypes;
+        body.version = this.version;
+        form.body = body;
+        form.query = this._buildQuery();
+        form.method = this._methodBuilder(_methods.SUBSCRIBE);
+        return this._request({form})
     }
 
 }
