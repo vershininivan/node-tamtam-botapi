@@ -1,7 +1,8 @@
 const EventEmitter = require('eventemitter3');
-const request = require('request');
+const request = require('request-promise');
 
 const _methods = {
+    GET_MY_INFO: 'getMyInfo',
     SEND_MESSAGE: 'sendMessage',
     GET_ALL_CHATS: 'getAllMessage',
     GET_CHAT: 'getChats',
@@ -22,7 +23,7 @@ const _updateType = [
     'chat_title_changed'
 ];
 
-class TamTamBot extends EventEmitter{
+class TamTamBot extends EventEmitter {
 
     constructor(token, options = {}) {
         super();
@@ -50,6 +51,10 @@ class TamTamBot extends EventEmitter{
     _methodBuilder(methodName, _chatId) {
         const builder = {};
         switch (methodName) {
+            case _methods.GET_MY_INFO:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/me`;
+                break;
             case _methods.SEND_MESSAGE:
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/messages`;
@@ -105,10 +110,8 @@ class TamTamBot extends EventEmitter{
         options.url = parameters.form.method.url;
         options.qs = parameters.form.query;
         options.body = JSON.stringify(parameters.form.body);
-        return request( null, options, function (error, response, body) {
+        return request(null, options, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                console.log('Response statusCode:', response.statusCode);
-                console.log('Response body:', body);
             } else {
                 console.log('Response ERROR:', error);
                 console.log('Response statusCode:', response.statusCode);
@@ -131,6 +134,16 @@ class TamTamBot extends EventEmitter{
     }
 
     /**
+     * Get current bot info
+     */
+    getMyInfo(form = {}) {
+        form.method = this._methodBuilder(_methods.GET_MY_INFO);
+        form.query = this._buildQuery(form);
+        return this._request({form});
+    }
+
+    /**
+     * Send message
      *
      * @param userId
      * @param chatId
