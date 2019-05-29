@@ -2,7 +2,7 @@ const TamTamBotApi = require('..');
 const assert = require('assert');
 const is = require('is');
 
-const TOKEN = 'wzkaE8SrN9Nmu9I-CdSfGjnwxAdKO2CYVv8PfTGvodc';
+const TOKEN = process.env.TEST_TAMTAM_BOTAPI_TOKEN;
 
 if (!TOKEN) {
     throw new Error('Bot token not provided');
