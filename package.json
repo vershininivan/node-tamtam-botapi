@@ -3,9 +3,14 @@
   "version": "0.0.2",
   "description": "TamTam Bot API",
   "main": "./index.js",
-  "directories": {},
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "mocha"
+    "mocha": "mocha",
+    "prepublishOnly": "npm run build",
+    "test": "npm run eslint && istanbul cover ./node_modules/mocha/bin/_mocha",
+    "eslint": "eslint ./core ./test"
   },
   "keywords": [
     "tamtam",
