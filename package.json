@@ -16,6 +16,9 @@
     "express": "^4.17.1",
     "request": "^2.88.0"
   },
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/vershininivan/node-tamtam-botapi.git"
