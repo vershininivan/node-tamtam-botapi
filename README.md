@@ -2,6 +2,7 @@
 [![Bot API](https://img.shields.io/badge/TamTam%20Bot%20API-0.1.6-blue.svg)](https://dev.tamtam.chat)
 [![Build Status](https://travis-ci.com/vershininivan/node-tamtam-botapi.svg?branch=first-version)](https://travis-ci.org/yagop/node-telegram-bot-api)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvershininivan%2Fnode-tamtam-botapi.svg?type=shield)]()
+[![codecov](https://codecov.io/gh/vershininivan/node-tamtam-botapi/branch/master/graph/badge.svg)](https://codecov.io/gh/vershininivan/node-tamtam-botapi)
 
 ## Install
 
