@@ -148,24 +148,6 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
-     * Send message
-     *
-     * @param userId
-     * @param chatId
-     * @param body
-     * @param form
-     * @returns {request.Request}
-     */
-    sendMessage(userId, chatId, body, form = {}) {
-        form.user_id = userId;
-        form.chat_id = chatId;
-        form.body = body;
-        form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
-        form.query = this._buildQuery(form);
-        return this._request({form});
-    }
-
-    /**
      *
      * @param count
      * @param marker
@@ -201,8 +183,34 @@ class TamTamBot extends EventEmitter {
         return this._request({form})
     }
 
-    editMessage(messageId, form = {}) {
+    /**
+     * Send message
+     *
+     * @param userId
+     * @param chatId
+     * @param body
+     * @param form
+     * @returns {request.Request}
+     */
+    sendMessage(userId, chatId, body, form = {}) {
+        form.user_id = userId;
+        form.chat_id = chatId;
+        form.body = body;
+        form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form});
+    }
+
+    /**
+     *
+     * @param messageId
+     * @param body
+     * @param form
+     * @returns {request.Request}
+     */
+    editMessage(messageId, body, form = {}) {
         form.message_id = messageId;
+        form.body = body;
         form.method = this._methodBuilder(_methods.GET_MESSAGES);
         form.query = this._buildQuery(form);
         return this._request({form})
