@@ -4,6 +4,7 @@ const request = require('request-promise');
 const _methods = {
     GET_MY_INFO: 'getMyInfo',
     SEND_MESSAGE: 'sendMessage',
+    EDIT_MESSAGE: 'editMessage',
     GET_ALL_CHATS: 'getAllMessage',
     GET_CHAT: 'getChats',
     GET_MESSAGES: 'getMessages',
@@ -57,6 +58,10 @@ class TamTamBot extends EventEmitter {
                 break;
             case _methods.SEND_MESSAGE:
                 builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/messages`;
+                break;
+            case _methods.EDIT_MESSAGE:
+                builder.verbs = 'PUT';
                 builder.url = `${this.options.baseApiUrl}/messages`;
                 break;
             case _methods.GET_ALL_CHATS:
@@ -196,6 +201,13 @@ class TamTamBot extends EventEmitter {
         return this._request({form})
     }
 
+    editMessage(messageId, form = {}) {
+        form.message_id = messageId;
+        form.method = this._methodBuilder(_methods.GET_MESSAGES);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
     /**
      *
      * @param url
@@ -218,4 +230,3 @@ class TamTamBot extends EventEmitter {
 }
 
 module.exports = TamTamBot;
-
