@@ -99,6 +99,7 @@ class TamTamBot extends EventEmitter {
         qs.count = form.count;
         qs.marker = form.marker;
         qs.access_token = this.token;
+        qs.message_id = form.message_id;
         qs.v = this.version;
         return qs;
     }
@@ -211,7 +212,7 @@ class TamTamBot extends EventEmitter {
     editMessage(messageId, body, form = {}) {
         form.message_id = messageId;
         form.body = body;
-        form.method = this._methodBuilder(_methods.GET_MESSAGES);
+        form.method = this._methodBuilder(_methods.EDIT_MESSAGE);
         form.query = this._buildQuery(form);
         return this._request({form})
     }
