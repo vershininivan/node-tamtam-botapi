@@ -1,17 +1,47 @@
+require('dotenv').config();
 const EventEmitter = require('eventemitter3');
 const request = require('request-promise');
 
 const _methods = {
+    /**
+     * bots
+     */
     GET_MY_INFO: 'getMyInfo',
+    EDIT_MY_INFO: 'editMyInfo',
+    /**
+     * chats
+     */
+    GET_ALL_CHATS: 'getAllMessage',
+    GET_CHAT: 'getChat',
+    EDIT_CHAT: 'editChat',
+    SEND_ACTION: 'sendAction',
+    GET_MEMERSHIP: 'getMembership',
+    LEAVE_CHAT: 'leaveChat',
+    GET_MEMBERS: 'getMembers',
+    ADD_MEMBERS: 'addMembers',
+    REMOVE_MEMBER: 'removeMember',
+    /**
+     * messages
+     */
+    GET_MESSAGES: 'getMessages',
     SEND_MESSAGE: 'sendMessage',
     EDIT_MESSAGE: 'editMessage',
-    GET_ALL_CHATS: 'getAllMessage',
-    GET_CHAT: 'getChats',
-    GET_MESSAGES: 'getMessages',
-    SUBSCRIBE: 'subscribe'
+    DELETE_MESSAGE: 'deleteMessage',
+    ANSWER_ON_CALLBACK: 'answerOnCallback',
+    /**
+     * subscriptions
+     */
+    GET_SUBSCRIPTIONS: 'getSubscriptions',
+    SUBSCRIBE: 'subscribe',
+    UNSUBSCRIBE: 'unsubscribe',
+    GET_UPDATES: 'getUpdates',
+    /**
+     * upload
+     */
+    GET_UPLOAD_URL: 'getUploadUrl'
 };
 
-const _updateType = [
+const _updateTypes = [
     'message_callback',
     'message_created',
     'message_removed',
@@ -56,13 +86,9 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/me`;
                 break;
-            case _methods.SEND_MESSAGE:
-                builder.verbs = 'POST';
-                builder.url = `${this.options.baseApiUrl}/messages`;
-                break;
-            case _methods.EDIT_MESSAGE:
-                builder.verbs = 'PUT';
-                builder.url = `${this.options.baseApiUrl}/messages`;
+            case _methods.EDIT_MY_INFO:
+                builder.verbs = 'PATCH';
+                builder.url = `${this.options.baseApiUrl}/me`;
                 break;
             case _methods.GET_ALL_CHATS:
                 builder.verbs = 'GET';
@@ -72,14 +98,72 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}`;
                 break;
+            case _methods.EDIT_CHAT:
+                builder.verbs = 'PATCH';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}`;
+                break;
+            case _methods.SEND_ACTION:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/actions`;
+                break;
+            case _methods.GET_MEMERSHIP:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members/me`;
+                break;
+            case _methods.LEAVE_CHAT:
+                builder.verbs = 'DELETE';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members/me`;
+                break;
+            case _methods.GET_MEMBERS:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members`;
+                break;
+            case _methods.ADD_MEMBERS:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members`;
+                break;
+            case _methods.REMOVE_MEMBER:
+                builder.verbs = 'DELETE';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members`;
+                break;
             case _methods.GET_MESSAGES:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/messages`;
+                break;
+            case _methods.SEND_MESSAGE:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/messages`;
+                break;
+            case _methods.EDIT_MESSAGE:
+                builder.verbs = 'PUT';
+                builder.url = `${this.options.baseApiUrl}/messages`;
+                break;
+            case _methods.DELETE_MESSAGE:
+                builder.verbs = 'DELETE';
+                builder.url = `${this.options.baseApiUrl}/messages`;
+                break;
+            case _methods.ANSWER_ON_CALLBACK:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/answers`;
+                break;
+            case _methods.GET_SUBSCRIPTIONS:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/subscriptions`;
                 break;
             case _methods.SUBSCRIBE:
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/subscriptions`;
                 break;
+            case _methods.UNSUBSCRIBE:
+                builder.verbs = 'DELETE';
+                builder.url = `${this.options.baseApiUrl}/subscriptions`;
+                break;
+            case _methods.GET_UPDATES:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/updates`;
+                break;
+            default:
+                throw new Error('Undefined method name')
         }
         return builder;
     }
@@ -98,8 +182,10 @@ class TamTamBot extends EventEmitter {
         qs.to = form.to;
         qs.count = form.count;
         qs.marker = form.marker;
-        qs.access_token = this.token;
         qs.message_id = form.message_id;
+        qs.message_ids = form.message_ids;
+        qs.user_ids = form.user_ids;
+        qs.access_token = this.token;
         qs.v = this.version;
         return qs;
     }
@@ -131,8 +217,17 @@ class TamTamBot extends EventEmitter {
      * @param update
      */
     updateHandler(update) {
-        const updateType = update.update_type;
-        switch (updateType) {
+        let receivedUpdateType;
+        if (update.update_type === undefined) {
+            throw new Error('Can not find \'update_type\' in response')
+        } else {
+            receivedUpdateType = update.update_type;
+            if (_updateTypes.find(receivedUpdateType) === -1) {
+                throw new Error('Received \'update_type\' not found')
+            }
+        }
+
+        switch (receivedUpdateType) {
             case 'bot_started':
                 this.emit('bot_started', update);
                 break;
@@ -141,6 +236,12 @@ class TamTamBot extends EventEmitter {
 
     /**
      * Get current bot info
+     * Returns info about current bot. Current bot can be identified by access token.
+     * Method returns bot identifier, name and avatar (if any).
+     * https://dev.tamtam.chat/#operation/getMyInfo
+     *
+     * @param form
+     * @returns {request.Request}
      */
     getMyInfo(form = {}) {
         form.method = this._methodBuilder(_methods.GET_MY_INFO);
@@ -149,9 +250,28 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Edit current bot info
+     * Edits current bot info. Fill only the fields you want to update. All remaning fields will stay untouched.
+     * https://dev.tamtam.chat/#operation/editMyInfo
      *
-     * @param count
-     * @param marker
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    editMyInfo(body, form = {}) {
+        form.body = body;
+        form.method = this._methodBuilder(_methods.EDIT_MY_INFO);
+        form.query = this._buildQuery(form);
+        return this._request({form});
+    }
+
+    /**
+     * Get all chats
+     * Returns information about chats that bot participated in: a result list and marker points to the next page.
+     * https://dev.tamtam.chat/#operation/getChats
+     *
+     * @param {Number} count
+     * @param {Number} marker
      * @param form
      * @returns {request.Request}
      */
@@ -164,12 +284,146 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Get chat
+     * Returns info about chat.
+     * https://dev.tamtam.chat/#operation/getChat
      *
-     * @param chatId
-     * @param messageIds
-     * @param from
-     * @param to
-     * @param count
+     * @param {Number} chatId
+     * @param form
+     * @returns {request.Request}
+     */
+    getChat(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.GET_CHAT, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Edit chat info
+     * Edits chat info: title, icon, etc…
+     * https://dev.tamtam.chat/#operation/editChat
+     *
+     * @param {Number} chatId
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    editChat(chatId, body, form = {}) {
+        form.body = body;
+        form.method = this._methodBuilder(_methods.EDIT_CHAT, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Send action
+     * https://dev.tamtam.chat/#operation/sendAction
+     *
+     * @param {Number} chatId
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    sendAction(chatId, body, form = {}) {
+        form.body = body;
+        form.method = this._methodBuilder(_methods.SEND_ACTION, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Get chat membership
+     * Returns chat membership info for current bot
+     * https://dev.tamtam.chat/#operation/getMembership
+     *
+     * @param {Number} chatId
+     * @param form
+     * @returns {request.Request}
+     */
+    getMembership(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.GET_MEMERSHIP, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Leave chat
+     * Removes bot from chat members.
+     * https://dev.tamtam.chat/#operation/leaveChat
+     *
+     * @param {Number} chatId
+     * @param form
+     * @returns {request.Request}
+     */
+    leaveChat(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Get members
+     * https://dev.tamtam.chat/#operation/getMembers
+     *
+     * @param {Number} chatId
+     * @param {Number} userIds
+     * @param {Number} marker
+     * @param {Number} count
+     * @param form
+     * @returns {request.Request}
+     */
+    getMembers(chatId, userIds, marker, count, form = {}) {
+        form.user_ids = userIds;
+        form.marker = marker;
+        form.count = count;
+        form.method = this._methodBuilder(_methods.GET_MEMBERS, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Add members
+     * Adds members to chat. Additional permissions may require.
+     * https://dev.tamtam.chat/#operation/addMembers
+     *
+     * @param {Number} chatId
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    addMembers(chatId, body, form = {}) {
+        form.body = body;
+        form.method = this._methodBuilder(_methods.ADD_MEMBERS, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     *
+     * @param {Number} chatId
+     * @param {Number} serId
+     * @param form
+     * @returns {request.Request}
+     */
+    removeMember(chatId, userId, form = {}) {
+        form.user_id = userId;
+        form.method = this._methodBuilder(_methods.REMOVE_MEMBER, chatId);
+        form.query = this._buildQuery(form);
+        return this._request({form})
+    }
+
+    /**
+     * Get messages
+     * Returns messages in chat: result page and marker referencing to the next page.
+     * Messages traversed in reverse direction so the latest message in chat will be first in result array.
+     * Therefore if you use from and to parameters, to must be less than from
+     * https://dev.tamtam.chat/#operation/getMessages
+     *
+     * @param {Number} chatId
+     * @param {Number} messageIds
+     * @param {Number} from
+     * @param {Number} to
+     * @param {Number} count
      * @param form
      * @returns {request.Request}
      */
@@ -186,10 +440,12 @@ class TamTamBot extends EventEmitter {
 
     /**
      * Send message
+     * Sends a message to a chat. As a result for this method new message identifier returns.
+     * https://dev.tamtam.chat/#operation/sendMessage
      *
-     * @param userId
-     * @param chatId
-     * @param body
+     * @param {Number} userId
+     * @param {Number} chatId
+     * @param {Object} body
      * @param form
      * @returns {request.Request}
      */
@@ -203,9 +459,14 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Edit message
+     * Updated message should be sent as NewMessageBody in a request body.
+     * In case attachments field is null, the current message attachments won’t be changed.
+     * In case of sending an empty list in this field, all attachments will be deleted.
+     * https://dev.tamtam.chat/#operation/editMessage
      *
-     * @param messageId
-     * @param body
+     * @param {Number} messageId
+     * @param {Object} body
      * @param form
      * @returns {request.Request}
      */
@@ -218,10 +479,13 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Subscribes bot to receive updates via WebHook.
+     * After calling this method, the bot will receive notifications about new events in chat rooms at the specified URL
+     * https://dev.tamtam.chat/#operation/subscribe
      *
-     * @param url
-     * @param updateTypes
-     * @param version
+     * @param {String} url
+     * @param {Array} updateTypes
+     * @param {Number} version
      * @param form
      * @returns {request.Request}
      */

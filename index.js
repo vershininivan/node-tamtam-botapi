@@ -1,1 +1,1 @@
-module.exports = require('./core/tamtam');
+module.exports = require('./core/tamtam')
