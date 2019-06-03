@@ -1,7 +1,5 @@
 language:
   node_js
-install:
-  - npm install -g codecov
 node_js:
   - "12"
   - "10"
@@ -10,8 +8,7 @@ node_js:
   - "7"
   - "6"
 script:
-  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
-  - codecov
+  - istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && codecov
 cache:
   directories:
     - node_modules
