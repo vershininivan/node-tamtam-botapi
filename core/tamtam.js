@@ -203,12 +203,10 @@ class TamTamBot extends EventEmitter {
         options.qs = parameters.form.query;
         options.body = JSON.stringify(parameters.form.body);
         return request(null, options, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-            } else {
-                console.log('Response ERROR:', error);
-                console.log('Response statusCode:', response.statusCode);
-                console.log('Response body:', body);
-            }
+            // if (response.statusCode !== 200) {
+            //     // console.log('Response statusCode:', response.statusCode);
+            //     // console.log('Response body:', body);
+            // }
         })
     }
 
