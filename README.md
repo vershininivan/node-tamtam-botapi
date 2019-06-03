@@ -4,7 +4,6 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvershininivan%2Fnode-tamtam-botapi.svg?type=shield)]()
 [![codecov](https://codecov.io/gh/vershininivan/node-tamtam-botapi/branch/master/graph/badge.svg)](https://codecov.io/gh/vershininivan/node-tamtam-botapi)
 [![NPM version](https://img.shields.io/npm/v/node-tamtam-botapi.svg?color=blue)](https://www.npmjs.com/package/node-tamtam-botapi)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 
 ## Install
 

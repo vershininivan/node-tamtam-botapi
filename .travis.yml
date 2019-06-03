@@ -1,4 +1,7 @@
-language: node_js
+language:
+  node_js
+install:
+  - npm install -g codecov
 node_js:
   - "12"
   - "10"
@@ -6,8 +9,9 @@ node_js:
   - "8"
   - "7"
   - "6"
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+script:
+  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - codecov
 cache:
   directories:
     - node_modules

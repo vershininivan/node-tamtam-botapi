@@ -25,6 +25,7 @@
   "devDependencies": {
     "dotenv": "^8.0.0",
     "is": "^3.3.0",
+    "istanbul": "^0.4.5",
     "mocha": "^6.1.4"
   },
   "repository": {

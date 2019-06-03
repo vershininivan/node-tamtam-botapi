@@ -75,8 +75,8 @@ class TamTamBot extends EventEmitter {
 
     /**
      *
-     * @param methodName
-     * @param _chatId
+     * @param {String} methodName
+     * @param {Number} _chatId
      * @private
      */
     _methodBuilder(methodName, _chatId) {
@@ -214,23 +214,46 @@ class TamTamBot extends EventEmitter {
 
     /**
      *
-     * @param update
+     * @param {Object} update
      */
-    updateHandler(update) {
-        let receivedUpdateType;
-        if (update.update_type === undefined) {
-            throw new Error('Can not find \'update_type\' in response')
-        } else {
-            receivedUpdateType = update.update_type;
-            if (_updateTypes.find(receivedUpdateType) === -1) {
-                throw new Error('Received \'update_type\' not found')
+    webhookUpdateTypeHandler(update) {
+        if (update.update_type === !undefined) {
+            if (TamTamBot._checkUpdateType(update)) {
+                this.emit(update.update_type, update);
             }
+        } else {
+            throw new Error('Can not find parameter \'update_type\' in response body')
         }
+    }
 
-        switch (receivedUpdateType) {
-            case 'bot_started':
-                this.emit('bot_started', update);
-                break;
+    /**
+     *
+     * @param {Object} update
+     */
+    longPollingUpdateTypeHandler(update) {
+        if ((update.updates === !undefined) || !update.updates.isArray()) {
+            let updates = update.updates;
+            updates.forEach(function (updatesElement) {
+                if (TamTamBot._checkUpdateType(updatesElement)) {
+                    this.emit(updatesElement.update_type, update)
+                }
+            });
+        } else {
+            throw new Error('Can not find parameter \'updates\' in response body')
+        }
+    }
+
+    /**
+     *
+     * @param {Object} update
+     * @private
+     */
+    static _checkUpdateType(update) {
+        let receivedUpdateType = update.update_type;
+        if (_updateTypes.find(receivedUpdateType) === -1) {
+            throw new Error('Expected value ' + update.update_type + ' of \'update_type\' not found')
+        } else {
+            return true;
         }
     }
 
@@ -399,9 +422,12 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Remove member
+     * Removes member from chat. Additional permissions may require.
+     * https://dev.tamtam.chat/#operation/removeMember
      *
-     * @param {Number} chatId
-     * @param {Number} serId
+     * @param chatId
+     * @param userId
      * @param form
      * @returns {request.Request}
      */
