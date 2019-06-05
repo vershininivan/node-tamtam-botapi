@@ -59,9 +59,9 @@ class TamTamBot extends EventEmitter {
     constructor(token, options = {}) {
         super();
         this.token = token;
-        this.version = '0.1.6';
+        this.version = process.env.API_VERSION;
         this.options = options;
-        this.options.baseApiUrl = 'https://botapi.tamtam.chat';
+        this.options.baseApiUrl = process.env.HOST;
     }
 
     /**
@@ -202,12 +202,13 @@ class TamTamBot extends EventEmitter {
         options.url = parameters.form.method.url;
         options.qs = parameters.form.query;
         options.body = JSON.stringify(parameters.form.body);
-        return request(null, options, function (error, response, body) {
-            // if (response.statusCode !== 200) {
-            //     // console.log('Response statusCode:', response.statusCode);
-            //     // console.log('Response body:', body);
-            // }
-        })
+        return request(null, options, function (error, response, body){});
+        // {
+        //     if (response.statusCode !== 200) {
+        //         console.log('Response statusCode:', response.statusCode);
+        //         console.log('Response body:', body);
+        //     }
+        // })
     }
 
     /**
@@ -387,7 +388,7 @@ class TamTamBot extends EventEmitter {
      * https://dev.tamtam.chat/#operation/getMembers
      *
      * @param {Number} chatId
-     * @param {Number} userIds
+     * @param {Array} userIds
      * @param {Number} marker
      * @param {Number} count
      * @param form
