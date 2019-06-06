@@ -184,7 +184,12 @@ class TamTamBot extends EventEmitter {
         qs.marker = form.marker;
         qs.message_id = form.message_id;
         qs.message_ids = form.message_ids;
+        qs.callback_id = form.callback_id;
         qs.user_ids = form.user_ids;
+        qs.url = form.url;
+        qs.limit = form.limit;
+        qs.timeout = form.timeout;
+        qs.types = form.types;
         qs.access_token = this.token;
         qs.v = this.version;
         return qs;
@@ -196,19 +201,13 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      * @private
      */
-    _request(parameters = {}) {
+    static _request(parameters = {}) {
         const options = {};
         options.method = parameters.form.method.verbs;
         options.url = parameters.form.method.url;
         options.qs = parameters.form.query;
         options.body = JSON.stringify(parameters.form.body);
         return request(null, options, function (error, response, body){});
-        // {
-        //     if (response.statusCode !== 200) {
-        //         console.log('Response statusCode:', response.statusCode);
-        //         console.log('Response body:', body);
-        //     }
-        // })
     }
 
     /**
@@ -268,7 +267,7 @@ class TamTamBot extends EventEmitter {
     getMyInfo(form = {}) {
         form.method = this._methodBuilder(_methods.GET_MY_INFO);
         form.query = this._buildQuery(form);
-        return this._request({form});
+        return TamTamBot._request({form});
     }
 
     /**
@@ -284,7 +283,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_MY_INFO);
         form.query = this._buildQuery(form);
-        return this._request({form});
+        return TamTamBot._request({form});
     }
 
     /**
@@ -302,7 +301,7 @@ class TamTamBot extends EventEmitter {
         form.marker = marker;
         form.method = this._methodBuilder(_methods.GET_ALL_CHATS);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -317,7 +316,7 @@ class TamTamBot extends EventEmitter {
     getChat(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -334,7 +333,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -350,7 +349,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.SEND_ACTION, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -365,7 +364,7 @@ class TamTamBot extends EventEmitter {
     getMembership(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_MEMERSHIP, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -380,7 +379,7 @@ class TamTamBot extends EventEmitter {
     leaveChat(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -400,7 +399,7 @@ class TamTamBot extends EventEmitter {
         form.count = count;
         form.method = this._methodBuilder(_methods.GET_MEMBERS, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -417,7 +416,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.ADD_MEMBERS, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -434,7 +433,7 @@ class TamTamBot extends EventEmitter {
         form.user_id = userId;
         form.method = this._methodBuilder(_methods.REMOVE_MEMBER, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -460,7 +459,7 @@ class TamTamBot extends EventEmitter {
         form.count = count;
         form.method = this._methodBuilder(_methods.GET_MESSAGES);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
@@ -480,7 +479,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
         form.query = this._buildQuery(form);
-        return this._request({form});
+        return TamTamBot._request({form});
     }
 
     /**
@@ -500,29 +499,111 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_MESSAGE);
         form.query = this._buildQuery(form);
-        return this._request({form})
+        return TamTamBot._request({form})
     }
 
     /**
+     * Delete message
+     * Deletes message in a dialog or in a chat if bot has permission to delete messages.
+     * https://dev.tamtam.chat/#operation/deleteMessage
+     *
+     * @param {String} messageId
+     * @param form
+     * @returns {request.Request}
+     */
+    deleteMessage(messageId, form = {}) {
+        form.message_id = messageId;
+        form.method = this._methodBuilder(_methods.DELETE_MESSAGE);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Answer on callback
+     * This method should be called to send an answer after a user has clicked the button.
+     * The answer may be an updated message or/and a one-time user notification.
+     * https://dev.tamtam.chat/#operation/answerOnCallback
+     *
+     * @param {String} callbackId
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    answerOnCallback(callbackId, body, form = {}) {
+        form.callback_id = callbackId;
+        form.body = body;
+        form.method = this._methodBuilder(_methods.ANSWER_ON_CALLBACK);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Get subscriptions
+     * In case your bot gets data via WebHook, the method returns list of all subscriptions.
+     * https://dev.tamtam.chat/#operation/getSubscriptions
+     *
+     * @param form
+     * @returns {request.Request}
+     */
+    getSubscriptions(form = {}) {
+        form.method = this._methodBuilder(_methods.GET_SUBSCRIPTIONS);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Subscribe
      * Subscribes bot to receive updates via WebHook.
      * After calling this method, the bot will receive notifications about new events in chat rooms at the specified URL
      * https://dev.tamtam.chat/#operation/subscribe
      *
-     * @param {String} url
-     * @param {Array} updateTypes
-     * @param {Number} version
+     * @param {Object} body
      * @param form
      * @returns {request.Request}
      */
-    subscribe(url, updateTypes, version, form = {}) {
-        const body = {};
-        body.url = url;
-        body.update_types = updateTypes;
-        body.version = this.version;
+    subscribe(body, form = {}) {
         form.body = body;
         form.query = this._buildQuery();
         form.method = this._methodBuilder(_methods.SUBSCRIBE);
-        return this._request({form})
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Unsubscribe
+     * Unsubscribes bot from receiving updates via WebHook.
+     * After calling the method, the bot stops receiving notifications about new events.
+     * Notification via the long-poll API becomes available for the bot
+     * https://dev.tamtam.chat/#operation/unsubscribe
+     *
+     * @param {String} url
+     * @param form
+     */
+    unsubscribe(url, form = {}) {
+        form.query = this._buildQuery();
+        form.method = this._methodBuilder(_methods.UNSUBSCRIBE);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Get updates
+     * You can use this method for getting updates in case your bot is not subscribed to WebHook.
+     * The method based on long polling.
+     * https://dev.tamtam.chat/#operation/getUpdates
+     *
+     * @param {Number} limit
+     * @param {Number} timeout
+     * @param {Number} marker
+     * @param {Array} types
+     * @param form
+     */
+    getUpdates(limit, timeout, marker, types, form = {}) {
+        form.limit = limit;
+        form.timeout = timeout;
+        form.marker = marker;
+        form.types = types;
+        form.query = this._buildQuery();
+        form.method = this._methodBuilder(_methods.GET_UPDATES);
+        return TamTamBot._request({form})
     }
 
 }

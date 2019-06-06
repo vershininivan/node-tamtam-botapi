@@ -169,10 +169,10 @@ describe('TamTamBotAPI', function tamtamSuite() {
 
     describe('#leaveChat', function leaveChatSuite() {
         before(function() {
-            console.log('Members length: ' + utils.isUserChatMember(TOKEN_BOT_2, CHAT_ID_2, USER_ID_BOT_1))
+            console.log(utils.isUserChatMember(TOKEN_BOT_2, CHAT_ID_2, USER_ID_BOT_1))
         });
 
-        it('should return success after removes bot from chat members', function test() {
+        it('should return success after removes bot from chat members', function () {
             // return bot_1.leaveChat(CHAT_ID_2).then( resp => {
             //
             // })

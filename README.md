@@ -25,7 +25,7 @@ bot.subscribe(`https://${appName}.herokuapp.com/${path}`);
 app.post(`/${path}`, (req, res) => {
     console.log('Request body:', req.body);
     // Method for listen event
-    bot.updateHandler(req.body);
+    bot.webhookUpdateTypeHandler(req.body);
     res.sendStatus(200);
 });
 

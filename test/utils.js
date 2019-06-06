@@ -29,16 +29,14 @@ function randomInteger(min, max) {
 
 /**
  *
- * @param {Object} bot
+ * @param token
  * @param {Number} chatId
  * @param {Number} userIds
  */
 function isUserChatMember(token, chatId, userIds) {
     let bot = new TamTamBotApi(token);
-    bot.getMembers(chatId, userIds).then( resp => {
+    bot.getMembers(chatId, userIds).then(resp => {
         resp = JSON.parse(resp);
-        console.log(resp);
-        //let members = resp.members;
         return resp.members;
     });
 }
