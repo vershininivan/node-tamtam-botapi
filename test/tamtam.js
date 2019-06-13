@@ -37,7 +37,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             })
         });
 
-        describe('#editMyInfo', function editMyInfoSuite() {
+        describe.skip('#editMyInfo', function editMyInfoSuite() {
             it('should return object with current bot info, after change bot info', function test() {
                 let body = {};
                 let random = utils.randomInteger(0, 1000);
