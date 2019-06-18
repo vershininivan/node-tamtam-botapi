@@ -214,7 +214,7 @@ class TamTamBot extends EventEmitter {
      *
      * @param {Object} update
      */
-    webhookUpdateTypeHandler(update) {
+    webhookUpdateTypeHandler(update = {}) {
         if (update.update_type !== undefined) {
             if (TamTamBot._checkUpdateType(update)) {
                 this.emit(update.update_type, update);
@@ -228,7 +228,7 @@ class TamTamBot extends EventEmitter {
      *
      * @param {Object} update
      */
-    longPollingUpdateTypeHandler(update) {
+    longPollingUpdateTypeHandler(update = {}) {
         if ((update.updates === !undefined) || !update.updates.isArray()) {
             let updates = update.updates;
             updates.forEach(function (updatesElement) {
