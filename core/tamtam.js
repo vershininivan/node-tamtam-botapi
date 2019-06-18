@@ -55,8 +55,6 @@ const _updateTypes = [
 ];
 
 class TamTamBot extends EventEmitter {
-    update_type: undefined;
-    updates: boolean;
 
     constructor(configs, options = {}) {
         super();
