@@ -56,12 +56,12 @@ const _updateTypes = [
 
 class TamTamBot extends EventEmitter {
 
-    constructor(token, options = {}) {
+    constructor(configs, options = {}) {
         super();
-        this.token = token;
-        this.version = process.env.API_VERSION;
+        this.token = configs.token;
+        this.version = configs.version || process.env.API_VERSION;
         this.options = options;
-        this.options.baseApiUrl = process.env.HOST;
+        this.options.baseApiUrl = configs.host || process.env.HOST;
     }
 
     /**
@@ -215,7 +215,7 @@ class TamTamBot extends EventEmitter {
      * @param {Object} update
      */
     webhookUpdateTypeHandler(update) {
-        if (update.update_type === !undefined) {
+        if (update.update_type !== undefined) {
             if (TamTamBot._checkUpdateType(update)) {
                 this.emit(update.update_type, update);
             }

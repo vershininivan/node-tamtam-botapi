@@ -16,7 +16,9 @@ npm install --save node-tamtam-botapi
 ```j
 const TamTamBot = require('node-tamtam-botapi');
 
-const token = process.env.TEST_TAMTAM_BOTAPI_TOKEN || 'YOUR_TAMTAM_BOT_TOKEN';
+const TOKEN = process.env.TEST_TAMTAM_BOTAPI_TOKEN || 'YOUR_TAMTAM_BOT_TOKEN';
+
+bot = new TamTamBotApi(TOKEN)
 
 // Subscribe on webhook (example for Heroku)
 bot.subscribe(`https://${appName}.herokuapp.com/${path}`);

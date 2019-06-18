@@ -1,6 +1,6 @@
 {
   "name": "node-tamtam-botapi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TamTam Bot API",
   "main": "./index.js",
   "directories": {
@@ -20,11 +20,11 @@
     "eventemitter3": "^3.1.2",
     "express": "^4.17.1",
     "request": "^2.88.0",
+    "dotenv": "^8.0.0",
     "request-promise": "^4.2.4"
   },
   "devDependencies": {
     "codecov": "^3.5.0",
-    "dotenv": "^8.0.0",
     "is": "^3.3.0",
     "istanbul": "^0.4.5",
     "mocha": "^6.1.4"
