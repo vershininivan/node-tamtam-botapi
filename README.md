@@ -15,20 +15,45 @@ npm install --save node-tamtam-botapi
 
 ```j
 const TamTamBot = require('node-tamtam-botapi');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const TOKEN = process.env.TEST_TAMTAM_BOTAPI_TOKEN || 'YOUR_TAMTAM_BOT_TOKEN';
+const appName = process.env.HEROKU_APP_NAME || 'HEROKU_APP_NAME';
+const path = process.env.HEROKU_APP_PATH || 'HEROKU_APP_PATH';
 
-bot = new TamTamBotApi(TOKEN)
+const config = {
+    token: process.env.TOKEN,
+    host: process.env.HOST,
+    version: process.env.API_VERSION
+};
 
-// Subscribe on webhook (example for Heroku)
-bot.subscribe(`https://${appName}.herokuapp.com/${path}`);
+const bot = new TamTamBot(config);
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+const subscribeBody = {
+    url: `https://${appName}.herokuapp.com/${path}`
+};
+
+//Subscribes bot to receive updates via WebHook
+bot.subscribe(subscribeBody);
 
 // We are receiving updates at the route below!
 app.post(`/${path}`, (req, res) => {
-    console.log('Request body:', req.body);
-    // Method for listen event
+    console.log('Request body: ', req.body);
     bot.webhookUpdateTypeHandler(req.body);
-    res.sendStatus(200);
+    res.send({
+        success: true
+    });
+});
+
+// GET method route
+app.get('/webhook', function (req, res) {
+    res.send({
+        success: true
+    });
 });
 
 // Start Express Server
@@ -36,11 +61,12 @@ app.listen(PORT, () => {
     console.log(`Express server is listening on ${PORT}`);
 });
 
-bot.on('bot_started', update => {
-    bot.sendMessage(undefined, update.chat_id, body);
+const message = {};
+message.text = 'Hello! this is a test message';
+bot.on('message_created', update => {
+    bot.sendMessage(undefined, update.message.recipient.chat_id, message);
 });
 ```
-
 
 ## License
 
