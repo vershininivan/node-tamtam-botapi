@@ -216,7 +216,7 @@ class TamTamBot extends EventEmitter {
      */
     webhookUpdateTypeHandler(update = {}) {
         if (update.update_type !== undefined) {
-            if (TamTamBot._checkUpdateType(update)) {
+            if (_updateTypes.includes(update.update_type)) {
                 this.emit(update.update_type, update);
             }
         } else {
@@ -232,26 +232,12 @@ class TamTamBot extends EventEmitter {
         if ((update.updates === !undefined) || !update.updates.isArray()) {
             let updates = update.updates;
             updates.forEach(function (updatesElement) {
-                if (TamTamBot._checkUpdateType(updatesElement)) {
+                if (_updateTypes.includes(update.update_type)) {
                     this.emit(updatesElement.update_type, update)
                 }
             });
         } else {
             throw new Error('Can not find parameter \'updates\' in response body')
-        }
-    }
-
-    /**
-     *
-     * @param {Object} update
-     * @private
-     */
-    static _checkUpdateType(update) {
-        let receivedUpdateType = update.update_type;
-        if (_updateTypes.find(receivedUpdateType) === -1) {
-            throw new Error('Expected value ' + update.update_type + ' of \'update_type\' not found')
-        } else {
-            return true;
         }
     }
 
