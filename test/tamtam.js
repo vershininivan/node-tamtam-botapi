@@ -12,6 +12,7 @@ const CHAT_ID_2 = process.env.CHAT_ID_2;
 const DIALOG_ID = process.env.DIALOG_ID;
 const CHANNEL_ID = process.env.CHANNEL_ID;
 const HOST = process.env.HOST;
+const VERSION = process.env.API_VERSION;
 
 if (!TOKEN_BOT_1) {
     throw new Error('Bot token not provided')
@@ -22,16 +23,18 @@ describe('TamTamBotAPI', function tamtamSuite() {
     let bot_2;
 
     before(function beforeAll() {
-        const configs_1 = {};
-        configs_1.token = TOKEN_BOT_1;
-        configs_1.host = HOST;
-        configs_1.version = process.env.API_VERSION;
-        bot_1 = new TamTamBotApi(configs_1);
-        const configs_2 = {};
-        configs_2.token = TOKEN_BOT_2;
-        configs_2.host = HOST;
-        configs_2.version = process.env.API_VERSION;
-        bot_2 = new TamTamBotApi(configs_2)
+        const config_1 = {
+            token: TOKEN_BOT_1,
+            host: HOST,
+            version: VERSION
+        };
+        bot_1 = new TamTamBotApi(config_1);
+        const config_2 = {
+            token: TOKEN_BOT_2,
+            host: HOST,
+            version: VERSION
+        };
+        bot_2 = new TamTamBotApi(config_2)
     });
 
     describe('#bots', function bots() {
