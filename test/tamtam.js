@@ -1,3 +1,4 @@
+require('dotenv').config();
 const TamTamBotApi = require('..');
 const utils = require('./utils');
 const assert = require('assert');
@@ -181,5 +182,52 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 })
             })
         });
+
+        describe('#leaveChat', function leaveChatSuite() {
+            before(function () {
+                bot_1.addMembers(CHAT_ID_1, {user_ids: USER_ID_BOT_2})
+            })
+        })
     });
+
+    describe('#subscriptions', function subscriptions() {
+        const url = 'http://test.botapi.ok';
+        beforeEach(function () {
+            bot_1.subscribe({url: url});
+        });
+        describe('#getSubscriptions', function getSubscriptionsSuite() {
+            it('should returns list of all subscriptions', function test() {
+                return bot_1.getSubscriptions().then( resp => {
+                    resp = JSON.parse(resp);
+                    assert.ok(is.object(resp));
+                    assert.ok(is.equal(resp.subscriptions[0].url, url))
+                })
+            })
+        });
+        describe('#unsubscribe', function unsubscribeSuite() {
+            it('should returns boolean', function test() {
+                return bot_1.unsubscribe(url).then( resp => {
+                    resp = JSON.parse(resp);
+                    assert.ok(is.object(resp));
+                    assert.ok(is.equal(resp.success, true));
+                })
+            })
+        })
+
+    });
+
+    describe('#upload', function upload() {
+        describe('#getUploadUrl', function getUploadUrlSuite() {
+            const types = ['photo', 'video', 'audio', 'file'];
+            types.forEach(function (type) {
+                it('should return url', function test() {
+                    return bot_1.getUploadUrl(type).then(resp => {
+                        resp = JSON.parse(resp);
+                        assert.ok(is.object(resp));
+                        assert.ok(!is.undefined(resp.url));
+                    })
+                })
+            })
+        })
+    })
 });

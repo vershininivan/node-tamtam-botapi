@@ -1,4 +1,3 @@
-require('dotenv').config();
 const EventEmitter = require('eventemitter3');
 const request = require('request-promise');
 
@@ -59,9 +58,9 @@ class TamTamBot extends EventEmitter {
     constructor(configs, options = {}) {
         super();
         this.token = configs.token;
-        this.version = configs.version || process.env.API_VERSION;
+        this.version = configs.version;
         this.options = options;
-        this.options.baseApiUrl = configs.host || process.env.HOST;
+        this.options.baseApiUrl = configs.host;
     }
 
     /**
@@ -162,6 +161,10 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/updates`;
                 break;
+            case _methods.GET_UPLOAD_URL:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/uploads`;
+                break;
             default:
                 throw new Error('Undefined method name')
         }
@@ -190,6 +193,7 @@ class TamTamBot extends EventEmitter {
         qs.limit = form.limit;
         qs.timeout = form.timeout;
         qs.types = form.types;
+        qs.type = form.type;
         qs.access_token = this.token;
         qs.v = this.version;
         return qs;
@@ -229,7 +233,7 @@ class TamTamBot extends EventEmitter {
      * @param {Object} update
      */
     longPollingUpdateTypeHandler(update = {}) {
-        if ((update.updates === !undefined) || !update.updates.isArray()) {
+        if ((update.update_type !== undefined) || !update.updates.isArray()) {
             let updates = update.updates;
             updates.forEach(function (updatesElement) {
                 if (_updateTypes.includes(update.update_type)) {
@@ -549,7 +553,7 @@ class TamTamBot extends EventEmitter {
      */
     subscribe(body, form = {}) {
         form.body = body;
-        form.query = this._buildQuery();
+        form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.SUBSCRIBE);
         return TamTamBot._request({form})
     }
@@ -565,7 +569,8 @@ class TamTamBot extends EventEmitter {
      * @param form
      */
     unsubscribe(url, form = {}) {
-        form.query = this._buildQuery();
+        form.url = url;
+        form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.UNSUBSCRIBE);
         return TamTamBot._request({form})
     }
@@ -587,8 +592,23 @@ class TamTamBot extends EventEmitter {
         form.timeout = timeout;
         form.marker = marker;
         form.types = types;
-        form.query = this._buildQuery();
+        form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.GET_UPDATES);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Get upload URL
+     * Returns the URL for the subsequent file upload.
+     * https://dev.tamtam.chat/#operation/getUploadUrl
+     *
+     * @param {String} type
+     * @param form
+     */
+    getUploadUrl(type, form = {}) {
+        form.type = type;
+        form.query = this._buildQuery(form);
+        form.method = this._methodBuilder(_methods.GET_UPLOAD_URL);
         return TamTamBot._request({form})
     }
 

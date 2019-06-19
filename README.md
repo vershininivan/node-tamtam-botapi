@@ -61,8 +61,9 @@ app.listen(PORT, () => {
     console.log(`Express server is listening on ${PORT}`);
 });
 
-const message = {};
-message.text = 'Hello! this is a test message';
+const message = {
+    text: 'Hello! this is a test message'
+};
 bot.on('message_created', update => {
     bot.sendMessage(undefined, update.message.recipient.chat_id, message);
 });
