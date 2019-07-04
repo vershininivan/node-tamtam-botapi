@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/gh/vershininivan/node-tamtam-botapi/branch/first-version/graph/badge.svg)](https://codecov.io/gh/vershininivan/node-tamtam-botapi)
 [![NPM version](https://img.shields.io/npm/v/node-tamtam-botapi.svg?color=blue)](https://www.npmjs.com/package/node-tamtam-botapi)
 
+Module to interact with official [TamTam Bot API](https://dev.tamtam.chat).
+
 ## Install
 
 ```bash
@@ -13,7 +15,7 @@ npm install --save node-tamtam-botapi
 
 ## Usage
 
-```j
+```js
 const TamTamBot = require('node-tamtam-botapi');
 const express = require('express');
 const bodyParser = require('body-parser');

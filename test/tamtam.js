@@ -16,7 +16,7 @@ const HOST = process.env.HOST;
 const VERSION = process.env.API_VERSION;
 
 if (!TOKEN_BOT_1) {
-    throw new Error('Bot token not provided')
+    throw new Error('Bot token not provided');
 }
 
 describe('TamTamBotAPI', function tamtamSuite() {
@@ -35,7 +35,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             host: HOST,
             version: VERSION
         };
-        bot_2 = new TamTamBotApi(config_2)
+        bot_2 = new TamTamBotApi(config_2);
     });
 
     describe('#bots', function bots() {
@@ -45,7 +45,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.number(resp.user_id));
-                    assert.ok(is.string(resp.name))
+                    assert.ok(is.string(resp.name));
                 })
             })
         });
@@ -146,8 +146,8 @@ describe('TamTamBotAPI', function tamtamSuite() {
                         resp = JSON.parse(resp);
                         assert.ok(is.object(resp));
                         assert.ok(is.equal(resp.success, true));
-                    })
-                })
+                    });
+                });
             });
             it('should return error, after try send invalid action', function test() {
                 let body = {};
