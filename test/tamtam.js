@@ -50,7 +50,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             })
         });
 
-        describe.skip('#editMyInfo', function editMyInfoSuite() {
+        describe('#editMyInfo', function editMyInfoSuite() {
             it('should return object with current bot info, after change bot info', function test() {
                 let body = {};
                 let random = utils.randomInteger(0, 1000);
@@ -158,7 +158,9 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     let body = JSON.parse(response.body);
                     assert.ok(is.object(body));
                     assert.ok(is.equal(body.code, 'proto.payload'));
-                    assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") in unknown'));
+                    //assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") in unknown'));
+                    assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") not found in enum (possible values: ["typing_on","typing_off","sending_photo","sending_video","sending_audio","mark_seen"])'));
+                    //console.log(body.message);
                 })
             })
         });
