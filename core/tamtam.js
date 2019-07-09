@@ -166,7 +166,7 @@ class TamTamBot extends EventEmitter {
                 builder.url = `${this.options.baseApiUrl}/uploads`;
                 break;
             default:
-                throw new Error('Undefined method name')
+                throw new Error('Undefined method name');
         }
         return builder;
     }
@@ -224,7 +224,7 @@ class TamTamBot extends EventEmitter {
                 this.emit(update.update_type, update);
             }
         } else {
-            throw new Error('Can not find parameter \'update_type\' in response body')
+            throw new Error('Can not find parameter \'update_type\' in response body');
         }
     }
 
@@ -237,11 +237,11 @@ class TamTamBot extends EventEmitter {
             let updates = update.updates;
             updates.forEach(function (updatesElement) {
                 if (_updateTypes.includes(update.update_type)) {
-                    this.emit(updatesElement.update_type, update)
+                    this.emit(updatesElement.update_type, update);
                 }
             });
         } else {
-            throw new Error('Can not find parameter \'updates\' in response body')
+            throw new Error('Can not find parameter \'updates\' in response body');
         }
     }
 

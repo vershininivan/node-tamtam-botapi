@@ -22,6 +22,7 @@ if (!TOKEN_BOT_1) {
 describe('TamTamBotAPI', function tamtamSuite() {
     let bot_1;
     let bot_2;
+    this.retries(2);
 
     before(function beforeAll() {
         const config_1 = {
@@ -185,7 +186,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             })
         });
 
-        describe('#leaveChat', function leaveChatSuite() {
+        describe.skip('#leaveChat', function leaveChatSuite() {
             before(function () {
                 bot_1.addMembers(CHAT_ID_1, {user_ids: USER_ID_BOT_2})
             })
@@ -194,7 +195,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
 
     describe('#subscriptions', function subscriptions() {
         const url = 'http://test.botapi.ok';
-        beforeEach(function () {
+        before(function () {
             bot_1.subscribe({url: url});
         });
         describe('#getSubscriptions', function getSubscriptionsSuite() {
