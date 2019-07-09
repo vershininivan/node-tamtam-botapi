@@ -291,7 +291,7 @@ class TamTamBot extends EventEmitter {
         form.marker = marker;
         form.method = this._methodBuilder(_methods.GET_ALL_CHATS);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({form})
+        return TamTamBot._request({form});
     }
 
     /**
