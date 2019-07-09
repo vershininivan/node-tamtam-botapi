@@ -1,8 +1,8 @@
 # Node.js TamTam Bot API
 [![Bot API](https://img.shields.io/badge/TamTam%20Bot%20API-0.1.6-blue.svg)](https://dev.tamtam.chat)
-[![Build Status](https://travis-ci.com/vershininivan/node-tamtam-botapi.svg?branch=first-version)](https://travis-ci.org/yagop/node-telegram-bot-api)
+[![Build Status](https://travis-ci.com/vershininivan/node-tamtam-botapi.svg?branch=master)](https://travis-ci.org/vershininivan/node-tamtam-botapi)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvershininivan%2Fnode-tamtam-botapi.svg?type=shield)]()
-[![codecov](https://codecov.io/gh/vershininivan/node-tamtam-botapi/branch/first-version/graph/badge.svg)](https://codecov.io/gh/vershininivan/node-tamtam-botapi)
+[![codecov](https://codecov.io/gh/vershininivan/node-tamtam-botapi/branch/master/graph/badge.svg)](https://codecov.io/gh/vershininivan/node-tamtam-botapi)
 [![NPM version](https://img.shields.io/npm/v/node-tamtam-botapi.svg?color=blue)](https://www.npmjs.com/package/node-tamtam-botapi)
 
 Module to interact with official [TamTam Bot API](https://dev.tamtam.chat).
