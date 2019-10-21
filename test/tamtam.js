@@ -132,13 +132,13 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     let body = JSON.parse(response.body);
                     assert.ok(is.object(body));
                     assert.ok(is.equal(body.code, 'proto.payload'));
-                    assert.ok(is.equal(body.message, 'Cannot modify dialog info. Method is available for chats only.'));
+                    assert.ok(is.equal(body.message, 'Method is available for chats only.'));
                 })
             })
         });
 
         describe('#sendAction', function sendActionSuite() {
-            const actions = ['typing_on', 'typing_off', 'sending_photo', 'sending_video', 'sending_audio', 'mark_seen'];
+            const actions = ['typing_on', 'sending_file', 'sending_photo', 'sending_video', 'sending_audio', 'mark_seen'];
             actions.forEach(function (action) {
                 let body = {};
                 body.action = action;
@@ -160,7 +160,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(body));
                     assert.ok(is.equal(body.code, 'proto.payload'));
                     //assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") in unknown'));
-                    assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") not found in enum (possible values: ["typing_on","typing_off","sending_photo","sending_video","sending_audio","mark_seen"])'));
+                    assert.ok(is.equal(body.message, 'action: value not found in enum. Possible values are: typing_on, sending_photo, sending_video, sending_audio, sending_file, mark_seen'));
                     //console.log(body.message);
                 })
             })
