@@ -188,7 +188,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
 
         describe('#getAdmins', function getAdminsSuite() {
             it('should be one of admins', function test() {
-                return bot_1.getAdmins(CHAT_ID_1).then(resp => {
+                return bot_1.getChatAdmins(CHAT_ID_1).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.array(resp.members));
                     assert.ok(is.true(resp.members.some(member => member.user_id == USER_ID_BOT_1)));

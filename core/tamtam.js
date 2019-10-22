@@ -385,7 +385,7 @@ class TamTamBot extends EventEmitter {
      * @param form
      * @returns {request.Request}
      */
-    getAdmins(chatId, form = {}) {
+    getChatAdmins(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_ADMINS, chatId);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form})
