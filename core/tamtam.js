@@ -10,11 +10,11 @@ const _methods = {
     /**
      * chats
      */
-    GET_ALL_CHATS: 'getAllMessage',
+    GET_ALL_CHATS: 'getAllChats',
     GET_CHAT: 'getChat',
     EDIT_CHAT: 'editChat',
     SEND_ACTION: 'sendAction',
-    GET_MEMERSHIP: 'getMembership',
+    GET_MEMBERSHIP: 'getMembership',
     LEAVE_CHAT: 'leaveChat',
     GET_MEMBERS: 'getMembers',
     ADD_MEMBERS: 'addMembers',
@@ -105,7 +105,7 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/actions`;
                 break;
-            case _methods.GET_MEMERSHIP:
+            case _methods.GET_MEMBERSHIP:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members/me`;
                 break;
@@ -352,7 +352,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     getMembership(chatId, form = {}) {
-        form.method = this._methodBuilder(_methods.GET_MEMERSHIP, chatId);
+        form.method = this._methodBuilder(_methods.GET_MEMBERSHIP, chatId);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form})
     }
