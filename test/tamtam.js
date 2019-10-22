@@ -186,6 +186,16 @@ describe('TamTamBotAPI', function tamtamSuite() {
             })
         });
 
+        describe('#getAdmins', function getAdminsSuite() {
+            it('should be one of admins', function test() {
+                return bot_1.getAdmins(CHAT_ID_1).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.array(resp.members));
+                    assert.ok(is.true(resp.members.some(member => member.user_id == USER_ID_BOT_1)));
+                })
+            });
+        });
+
         describe.skip('#leaveChat', function leaveChatSuite() {
             before(function () {
                 bot_1.addMembers(CHAT_ID_1, {user_ids: USER_ID_BOT_2})
