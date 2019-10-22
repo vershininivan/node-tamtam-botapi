@@ -16,6 +16,7 @@ const _methods = {
     SEND_ACTION: 'sendAction',
     GET_MEMBERSHIP: 'getMembership',
     LEAVE_CHAT: 'leaveChat',
+    GET_ADMINS: 'getChatAdmins',
     GET_MEMBERS: 'getMembers',
     ADD_MEMBERS: 'addMembers',
     REMOVE_MEMBER: 'removeMember',
@@ -112,6 +113,10 @@ class TamTamBot extends EventEmitter {
             case _methods.LEAVE_CHAT:
                 builder.verbs = 'DELETE';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members/me`;
+                break;
+            case _methods.GET_ADMINS:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/members/admins`;
                 break;
             case _methods.GET_MEMBERS:
                 builder.verbs = 'GET';
@@ -368,6 +373,20 @@ class TamTamBot extends EventEmitter {
      */
     leaveChat(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form})
+    }
+
+    /**
+     * Get admins
+     * https://dev.tamtam.chat/#operation/getAdmins
+     *
+     * @param {Number} chatId
+     * @param form
+     * @returns {request.Request}
+     */
+    getAdmins(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.GET_ADMINS, chatId);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form})
     }
