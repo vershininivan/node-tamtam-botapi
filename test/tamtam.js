@@ -43,7 +43,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#getMyInfo', function getMyInfoSuite() {
             it('should return object with current bot info', function test() {
                 return bot_1.getMyInfo().then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.number(resp.user_id));
                     assert.ok(is.string(resp.name));
@@ -58,7 +57,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 body.name = 'Testing with CI #' + random;
                 body.description = 'Testing nodejs botapi with CI #'  + random;
                 return bot_1.editMyInfo(body).then( resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.name, body.name));
                     assert.ok(is.equal(resp.description, body.description));
@@ -71,7 +69,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#getAllChats', function getAllChatsSuite() {
             it('should return object with information about chat that bot participated in', function test() {
                 return bot_1.getAllChats(1).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(!is.undefined(resp.marker));
                 })
@@ -81,7 +78,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#getChat', function getChatSuite() {
             it('should returns info about chat', function test() {
                 return bot_1.getChat(CHAT_ID_1).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'chat'));
                     assert.ok(is.equal(resp.chat_id.toString(), CHAT_ID_1));
@@ -89,7 +85,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
             it('should returns info about channel', function test() {
                 return bot_1.getChat(CHANNEL_ID).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'channel'));
                     assert.ok(is.equal(resp.chat_id.toString(), CHANNEL_ID));
@@ -97,7 +92,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
             it('should returns info about dialog', function test() {
                 return bot_1.getChat(DIALOG_ID).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'dialog'));
                     assert.ok(is.equal(resp.chat_id.toString(), DIALOG_ID));
@@ -110,7 +104,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 body = {};
                 body.title = 'Test CI chat #1: ' + utils.randomInteger(0, 10000);
                 return bot_1.editChat(CHAT_ID_1, body).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.title, body.title));
                 })
@@ -119,7 +112,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 body = {};
                 body.title = 'Test CI channel ' + utils.randomInteger(0, 10000);
                 return bot_1.editChat(CHANNEL_ID, body).then(resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.title, body.title));
                 })
@@ -128,23 +120,20 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 let body = {};
                 body.title = 'Test CI dialog ' + utils.randomInteger(0, 10000);
                 return bot_1.editChat(DIALOG_ID, body).catch(res => {
-                    let response = JSON.parse(JSON.stringify(res.response));
-                    let body = JSON.parse(response.body);
-                    assert.ok(is.object(body));
-                    assert.ok(is.equal(body.code, 'proto.payload'));
-                    assert.ok(is.equal(body.message, 'Cannot modify dialog info. Method is available for chats only.'));
+                    assert.ok(is.object(res));
+                    assert.ok(is.equal(res.code, 'proto.payload'));
+                    assert.ok(is.equal(res.message, 'Method is available for chats only.'));
                 })
             })
         });
 
         describe('#sendAction', function sendActionSuite() {
-            const actions = ['typing_on', 'typing_off', 'sending_photo', 'sending_video', 'sending_audio', 'mark_seen'];
+            const actions = ['typing_on', 'sending_file', 'sending_photo', 'sending_video', 'sending_audio', 'mark_seen'];
             actions.forEach(function (action) {
                 let body = {};
                 body.action = action;
                 it('should return true if request ' + JSON.stringify(body) + ' was successful', function test() {
                     return bot_1.sendAction(CHAT_ID_1, body).then(resp => {
-                        resp = JSON.parse(resp);
                         assert.ok(is.object(resp));
                         assert.ok(is.equal(resp.success, true));
                     });
@@ -155,12 +144,10 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 let invalid_action = 'some_action';
                 body.action = invalid_action;
                 return bot_1.sendAction(DIALOG_ID, body).catch(res => {
-                    let response = JSON.parse(JSON.stringify(res.response));
-                    let body = JSON.parse(response.body);
-                    assert.ok(is.object(body));
-                    assert.ok(is.equal(body.code, 'proto.payload'));
+                    assert.ok(is.object(res));
+                    assert.ok(is.equal(res.code, 'proto.payload'));
                     //assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") in unknown'));
-                    assert.ok(is.equal(body.message, '/action: instance value ("' + invalid_action + '") not found in enum (possible values: ["typing_on","typing_off","sending_photo","sending_video","sending_audio","mark_seen"])'));
+                    assert.ok(is.equal(res.message, 'action: value not found in enum. Possible values are: typing_on, sending_photo, sending_video, sending_audio, sending_file, mark_seen'));
                     //console.log(body.message);
                 })
             })
@@ -169,7 +156,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#getMembership', function getMembershipSuite() {
             it('should returns chat membership info for current bot', function test() {
                 return bot_1.getMembership(CHAT_ID_1).then( resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.array(resp.permissions));
                     assert.ok(is.equal(resp.is_admin, true));
@@ -177,11 +163,9 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
             it('should returns error, because send chat_id from dialog', function test() {
                 return bot_1.getMembership(DIALOG_ID).catch( resp => {
-                    let response = JSON.parse(JSON.stringify(resp.response));
-                    let body = JSON.parse(response.body);
-                    assert.ok(is.object(body));
-                    assert.ok(is.equal(body.code, 'proto.payload'));
-                    assert.ok(is.equal(body.message, 'Method is available for chats only.'));
+                    assert.ok(is.object(resp));
+                    assert.ok(is.equal(resp.code, 'proto.payload'));
+                    assert.ok(is.equal(resp.message, 'Method is available for chats only.'));
                 })
             })
         });
@@ -201,7 +185,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#getSubscriptions', function getSubscriptionsSuite() {
             it('should returns list of all subscriptions', function test() {
                 return bot_1.getSubscriptions().then( resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.subscriptions[0].url, url))
                 })
@@ -210,7 +193,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
         describe('#unsubscribe', function unsubscribeSuite() {
             it('should returns boolean', function test() {
                 return bot_1.unsubscribe(url).then( resp => {
-                    resp = JSON.parse(resp);
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.success, true));
                 })
@@ -225,7 +207,6 @@ describe('TamTamBotAPI', function tamtamSuite() {
             types.forEach(function (type) {
                 it('should return url', function test() {
                     return bot_1.getUploadUrl(type).then(resp => {
-                        resp = JSON.parse(resp);
                         assert.ok(is.object(resp));
                         assert.ok(!is.undefined(resp.url));
                     })
