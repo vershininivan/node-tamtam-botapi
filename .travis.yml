@@ -1,12 +1,10 @@
 language:
   node_js
 node_js:
+  - "13"
   - "12"
   - "10"
   - "9"
-  - "8"
-  - "7"
-  - "6"
 script:
   - istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && codecov
 cache:

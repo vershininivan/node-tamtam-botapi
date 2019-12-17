@@ -8,6 +8,7 @@ const TOKEN_BOT_1 = process.env.TEST_TAMTAM_BOTAPI_TOKEN_1;
 const TOKEN_BOT_2 = process.env.TEST_TAMTAM_BOTAPI_TOKEN_2;
 const USER_ID_BOT_1 = process.env.USER_ID_BOT_1;
 const USER_ID_BOT_2 = process.env.USER_ID_BOT_2;
+const USER_ID_BOT_3 = process.env.USER_ID_BOT_3;
 const CHAT_ID_1 = process.env.CHAT_ID_1;
 const CHAT_ID_2 = process.env.CHAT_ID_2;
 const DIALOG_ID = process.env.DIALOG_ID;
@@ -22,7 +23,7 @@ if (!TOKEN_BOT_1) {
 describe('TamTamBotAPI', function tamtamSuite() {
     let bot_1;
     let bot_2;
-    this.retries(2);
+    this.retries(3);
 
     before(function beforeAll() {
         const config_1 = {
@@ -101,7 +102,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
 
         describe('#editChat', function editChatSuite() {
             it('should return info about chat, after change title', function test() {
-                body = {};
+                let body = {};
                 body.title = 'Test CI chat #1: ' + utils.randomInteger(0, 10000);
                 return bot_1.editChat(CHAT_ID_1, body).then(resp => {
                     assert.ok(is.object(resp));
@@ -109,7 +110,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 })
             });
             it('should return info about channel, after change title', function test() {
-                body = {};
+                let body = {};
                 body.title = 'Test CI channel ' + utils.randomInteger(0, 10000);
                 return bot_1.editChat(CHANNEL_ID, body).then(resp => {
                     assert.ok(is.object(resp));
@@ -141,8 +142,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
             it('should return error, after try send invalid action', function test() {
                 let body = {};
-                let invalid_action = 'some_action';
-                body.action = invalid_action;
+                body.action = 'some_action';
                 return bot_1.sendAction(DIALOG_ID, body).catch(res => {
                     assert.ok(is.object(res));
                     assert.ok(is.equal(res.code, 'proto.payload'));
@@ -168,21 +168,55 @@ describe('TamTamBotAPI', function tamtamSuite() {
             })
         });
 
+        describe('#leaveChat', function leaveChatSuite() {
+            it('should be return success', function test() {
+                bot_1.addMembers(CHAT_ID_1, {user_ids: [USER_ID_BOT_2]});
+                return bot_2.leaveChat(CHAT_ID_1).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.true(resp.success));
+                });
+            });
+        });
+
         describe('#getAdmins', function getAdminsSuite() {
             it('should be one of admins', function test() {
                 return bot_1.getAdmins(CHAT_ID_1).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.array(resp.members));
                     assert.ok(is.true(resp.members.some(member => member.user_id == USER_ID_BOT_1)));
-                })
+                });
             });
         });
 
-        describe.skip('#leaveChat', function leaveChatSuite() {
-            before(function () {
-                bot_1.addMembers(CHAT_ID_1, {user_ids: USER_ID_BOT_2})
-            })
-        })
+        describe('', function getMembersSuite() {
+            it('should be one of member', function test() {
+                return bot_1.getMembers(CHAT_ID_1).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.array(resp.members));
+                    assert.ok(is.true(resp.members.some(member => member.user_id == USER_ID_BOT_1)));
+                });
+            });
+        });
+
+        describe('#addMembers', function addMembersSuite() {
+            it('should be return success', function test() {
+                bot_1.removeMember(CHAT_ID_1, USER_ID_BOT_3);
+                return bot_1.addMembers(CHAT_ID_1, {user_ids: [USER_ID_BOT_3]}).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.true(resp.success));
+                });
+            });
+        });
+
+        describe('#removeMember', function removeMemberSuite() {
+            it('should be return success', function test() {
+                bot_1.addMembers(CHAT_ID_1, {user_ids: [USER_ID_BOT_2]});
+                return bot_1.removeMember(CHAT_ID_1, USER_ID_BOT_2).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.true(resp.success));
+                });
+            });
+        });
     });
 
     describe('#subscriptions', function subscriptions() {

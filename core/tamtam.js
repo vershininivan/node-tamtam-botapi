@@ -28,6 +28,7 @@ const _methods = {
     EDIT_MESSAGE: 'editMessage',
     DELETE_MESSAGE: 'deleteMessage',
     ANSWER_ON_CALLBACK: 'answerOnCallback',
+    CONSTRUCTS_MESSAGE: 'constructsMessage',
     /**
      * subscriptions
      */
@@ -51,7 +52,10 @@ const _updateTypes = [
     'user_added',
     'user_removed',
     'bot_started',
-    'chat_title_changed'
+    'chat_title_changed',
+    'message_construction_request',
+    'message_constructed',
+    'message_chat_created'
 ];
 
 const _uploadTypes = [
@@ -154,6 +158,10 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/answers`;
                 break;
+            case _methods.CONSTRUCTS_MESSAGE:
+                builder.verbs = 'POST';
+                builder.url = `${this.options.baseApiUrl}/answers/constructor`;
+                break;
             case _methods.GET_SUBSCRIPTIONS:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/subscriptions`;
@@ -203,7 +211,9 @@ class TamTamBot extends EventEmitter {
         qs.timeout = form.timeout;
         qs.types = form.types;
         qs.type = form.type;
+        qs.disable_link_preview = form.disableLinkPreview;
         qs.session_id = form.session_id;
+        qs.block = form.block;
         qs.access_token = this.token;
         qs.v = this.version;
         return qs;
@@ -224,14 +234,14 @@ class TamTamBot extends EventEmitter {
         return request(null, options)
             .then(response => {
                 try{
-                    return JSON.parse(response)
+                    return JSON.parse(response);
                 } catch(e) {
-                    throw response
+                    throw response;
                 }
             })
             .catch(error_response => {
-                throw JSON.parse(error_response.error)
-            })
+                throw JSON.parse(error_response.error);
+            });
     }
 
     /**
@@ -280,9 +290,7 @@ class TamTamBot extends EventEmitter {
     getMyInfo(form = {}) {
         form.method = this._methodBuilder(_methods.GET_MY_INFO);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -298,9 +306,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_MY_INFO);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -318,9 +324,7 @@ class TamTamBot extends EventEmitter {
         form.marker = marker;
         form.method = this._methodBuilder(_methods.GET_ALL_CHATS);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -335,9 +339,7 @@ class TamTamBot extends EventEmitter {
     getChat(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -354,9 +356,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -372,9 +372,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.SEND_ACTION, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -389,9 +387,7 @@ class TamTamBot extends EventEmitter {
     getMembership(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_MEMBERSHIP, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -406,9 +402,7 @@ class TamTamBot extends EventEmitter {
     leaveChat(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -443,9 +437,7 @@ class TamTamBot extends EventEmitter {
         form.count = count;
         form.method = this._methodBuilder(_methods.GET_MEMBERS, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -462,9 +454,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.ADD_MEMBERS, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -477,13 +467,12 @@ class TamTamBot extends EventEmitter {
      * @param form
      * @returns {request.Request}
      */
-    removeMember(chatId, userId, form = {}) {
+    removeMember(chatId, userId, block, form = {}) {
         form.user_id = userId;
+        form.block = block;
         form.method = this._methodBuilder(_methods.REMOVE_MEMBER, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -509,9 +498,7 @@ class TamTamBot extends EventEmitter {
         form.count = count;
         form.method = this._methodBuilder(_methods.GET_MESSAGES);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -521,19 +508,19 @@ class TamTamBot extends EventEmitter {
      *
      * @param {Number} userId
      * @param {Number} chatId
+     * @param {Boolean} disableLinkPreview
      * @param {Object} body
      * @param form
      * @returns {request.Request}
      */
-    sendMessage(userId, chatId, body, form = {}) {
+    sendMessage(userId, chatId, disableLinkPreview, body, form = {}) {
         form.user_id = userId;
         form.chat_id = chatId;
+        form.disable_link_preview = disableLinkPreview;
         form.body = body;
         form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -553,9 +540,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.EDIT_MESSAGE);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -571,9 +556,7 @@ class TamTamBot extends EventEmitter {
         form.message_id = messageId;
         form.method = this._methodBuilder(_methods.DELETE_MESSAGE);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -592,6 +575,21 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.ANSWER_ON_CALLBACK);
         form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     *
+     * @param {String} sessionId
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    constructsMessage(sessionId, body, form = {}) {
+        form.session_id = sessionId;
+        form.body = body;
+        form.method = this._methodBuilder(_methods.CONSTRUCTS_MESSAGE);
+        form.query = this._buildQuery(form);
         return TamTamBot._request({
             form
         });
@@ -608,9 +606,7 @@ class TamTamBot extends EventEmitter {
     getSubscriptions(form = {}) {
         form.method = this._methodBuilder(_methods.GET_SUBSCRIPTIONS);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -627,9 +623,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.SUBSCRIBE);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -646,9 +640,7 @@ class TamTamBot extends EventEmitter {
         form.url = url;
         form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.UNSUBSCRIBE);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -670,9 +662,7 @@ class TamTamBot extends EventEmitter {
         form.types = types;
         form.query = this._buildQuery(form);
         form.method = this._methodBuilder(_methods.GET_UPDATES);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
