@@ -11,6 +11,7 @@ const _methods = {
      * chats
      */
     GET_ALL_CHATS: 'getAllChats',
+    GET_CHAT_BY_LINK: 'getChatByLink',
     GET_CHAT: 'getChat',
     EDIT_CHAT: 'editChat',
     SEND_ACTION: 'sendAction',
@@ -85,9 +86,10 @@ class TamTamBot extends EventEmitter {
      *
      * @param {String} methodName
      * @param {Number} _chatId
+     * @param {String} _chatLink
      * @private
      */
-    _methodBuilder(methodName, _chatId) {
+    _methodBuilder(methodName, _chatId, _chatLink) {
         const builder = {};
         switch (methodName) {
             case _methods.GET_MY_INFO:
@@ -101,6 +103,10 @@ class TamTamBot extends EventEmitter {
             case _methods.GET_ALL_CHATS:
                 builder.verbs = 'GET';
                 builder.url = `${this.options.baseApiUrl}/chats`;
+                break;
+            case _methods.GET_CHAT_BY_LINK:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatLink}`;
                 break;
             case _methods.GET_CHAT:
                 builder.verbs = 'GET';
@@ -323,6 +329,21 @@ class TamTamBot extends EventEmitter {
         form.count = count;
         form.marker = marker;
         form.method = this._methodBuilder(_methods.GET_ALL_CHATS);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     * Get chat by link
+     * Returns chat/channel information by its public link or dialog with user by username
+     * https://dev.tamtam.chat/#operation/getChatByLink
+     *
+     * @param {String} chatLink
+     * @param form
+     * @returns {request.Request}
+     */
+    getChatByLink(chatLink, form = {}) {
+        form.method = this._methodBuilder(_methods.GET_CHAT_BY_LINK, null, chatLink);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }

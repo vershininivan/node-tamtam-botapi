@@ -47,8 +47,8 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(resp));
                     assert.ok(is.number(resp.user_id));
                     assert.ok(is.string(resp.name));
-                })
-            })
+                });
+            });
         });
 
         describe('#editMyInfo', function editMyInfoSuite() {
@@ -61,8 +61,8 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.name, body.name));
                     assert.ok(is.equal(resp.description, body.description));
-                })
-            })
+                });
+            });
         });
     });
 
@@ -72,8 +72,18 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 return bot_1.getAllChats(1).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(!is.undefined(resp.marker));
-                })
-            })
+                });
+            });
+        });
+
+        describe('#getChatByLink', function getChatByLinkSuite() {
+            it('should return object with information about chat by link that bot participated in', function test() {
+                return bot_2.getChatByLink('@UsefulLinks').then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.ok(is.equal(resp.type, 'channel'));
+                    assert.ok(is.equal(resp.link, 'https://tt.me/UsefulLinks'));
+                });
+            });
         });
 
         describe('#getChat', function getChatSuite() {
@@ -82,21 +92,21 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'chat'));
                     assert.ok(is.equal(resp.chat_id.toString(), CHAT_ID_1));
-                })
+                });
             });
             it('should returns info about channel', function test() {
                 return bot_1.getChat(CHANNEL_ID).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'channel'));
                     assert.ok(is.equal(resp.chat_id.toString(), CHANNEL_ID));
-                })
+                });
             });
             it('should returns info about dialog', function test() {
                 return bot_1.getChat(DIALOG_ID).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.type, 'dialog'));
                     assert.ok(is.equal(resp.chat_id.toString(), DIALOG_ID));
-                })
+                });
             });
         });
 
@@ -107,7 +117,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 return bot_1.editChat(CHAT_ID_1, body).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.title, body.title));
-                })
+                });
             });
             it('should return info about channel, after change title', function test() {
                 let body = {};
@@ -115,7 +125,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 return bot_1.editChat(CHANNEL_ID, body).then(resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.title, body.title));
-                })
+                });
             });
             it('should return error, after try to change title for dialog', function test() {
                 let body = {};
@@ -124,8 +134,8 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(res));
                     assert.ok(is.equal(res.code, 'proto.payload'));
                     assert.ok(is.equal(res.message, 'Method is available for chats only.'));
-                })
-            })
+                });
+            });
         });
 
         describe('#sendAction', function sendActionSuite() {
@@ -147,8 +157,8 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(res));
                     assert.ok(is.equal(res.code, 'proto.payload'));
                     assert.ok(is.equal(res.message, 'action: value not found in enum. Possible values are: typing_on, sending_photo, sending_video, sending_audio, sending_file, mark_seen'));
-                })
-            })
+                });
+            });
         });
 
         describe('#getMembership', function getMembershipSuite() {
@@ -157,15 +167,15 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     assert.ok(is.object(resp));
                     assert.ok(is.array(resp.permissions));
                     assert.ok(is.equal(resp.is_admin, true));
-                })
+                });
             });
             it('should returns error, because send chat_id from dialog', function test() {
                 return bot_1.getMembership(DIALOG_ID).catch( resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.code, 'proto.payload'));
                     assert.ok(is.equal(resp.message, 'Method is available for chats only.'));
-                })
-            })
+                });
+            });
         });
 
         describe('#leaveChat', function leaveChatSuite() {
@@ -230,18 +240,18 @@ describe('TamTamBotAPI', function tamtamSuite() {
             it('should returns list of all subscriptions', function test() {
                 return bot_1.getSubscriptions().then( resp => {
                     assert.ok(is.object(resp));
-                    assert.ok(is.equal(utils.isSubscribeOnUrl(resp, url_1), true))
-                })
-            })
+                    assert.ok(is.equal(utils.isSubscribeOnUrl(resp, url_1), true));
+                });
+            });
         });
         describe('#unsubscribe', function unsubscribeSuite() {
             it('should returns boolean', function test() {
                 return bot_1.unsubscribe(url_2).then( resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.success, true));
-                })
-            })
-        })
+                });
+            });
+        });
 
     });
 
@@ -253,9 +263,9 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     return bot_1.getUploadUrl(type).then(resp => {
                         assert.ok(is.object(resp));
                         assert.ok(!is.undefined(resp.url));
-                    })
-                })
-            })
-        })
-    })
+                    });
+                });
+            });
+        });
+    });
 });
