@@ -28,6 +28,7 @@ const _methods = {
     SEND_MESSAGE: 'sendMessage',
     EDIT_MESSAGE: 'editMessage',
     DELETE_MESSAGE: 'deleteMessage',
+    GET_MESSAGE_BY_ID: 'getMessageById',
     ANSWER_ON_CALLBACK: 'answerOnCallback',
     CONSTRUCTS_MESSAGE: 'constructsMessage',
     /**
@@ -87,9 +88,14 @@ class TamTamBot extends EventEmitter {
      * @param {String} methodName
      * @param {Number} _chatId
      * @param {String} _chatLink
+     * @param {String} _messageId
      * @private
      */
-    _methodBuilder(methodName, _chatId, _chatLink) {
+    _methodBuilder(methodName,
+                   _chatId = undefined,
+                   _chatLink = undefined,
+                   _messageId = undefined)
+    {
         const builder = {};
         switch (methodName) {
             case _methods.GET_MY_INFO:
@@ -160,6 +166,10 @@ class TamTamBot extends EventEmitter {
                 builder.verbs = 'DELETE';
                 builder.url = `${this.options.baseApiUrl}/messages`;
                 break;
+            case _methods.GET_MESSAGE_BY_ID:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/messages/${_messageId}`;
+                break;
             case _methods.ANSWER_ON_CALLBACK:
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/answers`;
@@ -203,7 +213,6 @@ class TamTamBot extends EventEmitter {
         const qs = {};
         qs.chat_id = form.chat_id;
         qs.user_id = form.user_id;
-        qs.message_ids = form.message_ids;
         qs.from = form.from;
         qs.to = form.to;
         qs.count = form.count;
@@ -217,7 +226,7 @@ class TamTamBot extends EventEmitter {
         qs.timeout = form.timeout;
         qs.types = form.types;
         qs.type = form.type;
-        qs.disable_link_preview = form.disableLinkPreview;
+        qs.disable_link_preview = form.disable_link_preview;
         qs.session_id = form.session_id;
         qs.block = form.block;
         qs.access_token = this.token;
@@ -310,7 +319,7 @@ class TamTamBot extends EventEmitter {
      */
     editMyInfo(body, form = {}) {
         form.body = body;
-        form.method = this._methodBuilder(_methods.EDIT_MY_INFO);
+        form.method = this._methodBuilder(_methods.EDIT_MY_INFO,undefined,undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -343,7 +352,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     getChatByLink(chatLink, form = {}) {
-        form.method = this._methodBuilder(_methods.GET_CHAT_BY_LINK, null, chatLink);
+        form.method = this._methodBuilder(_methods.GET_CHAT_BY_LINK, undefined, chatLink);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -358,7 +367,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     getChat(chatId, form = {}) {
-        form.method = this._methodBuilder(_methods.GET_CHAT, chatId);
+        form.method = this._methodBuilder(_methods.GET_CHAT, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -375,7 +384,7 @@ class TamTamBot extends EventEmitter {
      */
     editChat(chatId, body, form = {}) {
         form.body = body;
-        form.method = this._methodBuilder(_methods.EDIT_CHAT, chatId);
+        form.method = this._methodBuilder(_methods.EDIT_CHAT, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -391,7 +400,7 @@ class TamTamBot extends EventEmitter {
      */
     sendAction(chatId, body, form = {}) {
         form.body = body;
-        form.method = this._methodBuilder(_methods.SEND_ACTION, chatId);
+        form.method = this._methodBuilder(_methods.SEND_ACTION, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -406,7 +415,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     getMembership(chatId, form = {}) {
-        form.method = this._methodBuilder(_methods.GET_MEMBERSHIP, chatId);
+        form.method = this._methodBuilder(_methods.GET_MEMBERSHIP, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -421,7 +430,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     leaveChat(chatId, form = {}) {
-        form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId);
+        form.method = this._methodBuilder(_methods.LEAVE_CHAT, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -434,7 +443,7 @@ class TamTamBot extends EventEmitter {
      * @returns {request.Request}
      */
     getAdmins(chatId, form = {}) {
-        form.method = this._methodBuilder(_methods.GET_ADMINS, chatId);
+        form.method = this._methodBuilder(_methods.GET_ADMINS, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({
             form
@@ -456,7 +465,7 @@ class TamTamBot extends EventEmitter {
         form.user_ids = userIds;
         form.marker = marker;
         form.count = count;
-        form.method = this._methodBuilder(_methods.GET_MEMBERS, chatId);
+        form.method = this._methodBuilder(_methods.GET_MEMBERS, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -473,7 +482,7 @@ class TamTamBot extends EventEmitter {
      */
     addMembers(chatId, body, form = {}) {
         form.body = body;
-        form.method = this._methodBuilder(_methods.ADD_MEMBERS, chatId);
+        form.method = this._methodBuilder(_methods.ADD_MEMBERS, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -483,15 +492,16 @@ class TamTamBot extends EventEmitter {
      * Removes member from chat. Additional permissions may require.
      * https://dev.tamtam.chat/#operation/removeMember
      *
-     * @param chatId
-     * @param userId
+     * @param {Number} chatId
+     * @param {Number} userId
+     * @param {Boolean} block
      * @param form
      * @returns {request.Request}
      */
     removeMember(chatId, userId, block, form = {}) {
         form.user_id = userId;
         form.block = block;
-        form.method = this._methodBuilder(_methods.REMOVE_MEMBER, chatId);
+        form.method = this._methodBuilder(_methods.REMOVE_MEMBER, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -539,7 +549,7 @@ class TamTamBot extends EventEmitter {
         form.chat_id = chatId;
         form.disable_link_preview = disableLinkPreview;
         form.body = body;
-        form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId);
+        form.method = this._methodBuilder(_methods.SEND_MESSAGE, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -576,6 +586,21 @@ class TamTamBot extends EventEmitter {
     deleteMessage(messageId, form = {}) {
         form.message_id = messageId;
         form.method = this._methodBuilder(_methods.DELETE_MESSAGE);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     * Get message
+     * Returns single message by its identifier.
+     * https://dev.tamtam.chat/#operation/getMessageById
+     *
+     * @param messageId
+     * @param form
+     */
+    getMessageById(messageId, form = {}) {
+        form.message_id = messageId;
+        form.method = this._methodBuilder(_methods.GET_MESSAGE_BY_ID, undefined, undefined, messageId);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }

@@ -229,6 +229,61 @@ describe('TamTamBotAPI', function tamtamSuite() {
         });
     });
 
+    describe('#messages', function messages() {
+        describe('#getMessages', function getMessages() {
+            let msg = 'Test #getMessages #' + utils.randomInteger() ;
+            it('should send test message \"' + msg + '\"', function test() {
+                bot_1.sendMessage(undefined, CHAT_ID_1, undefined, {text: msg});
+                return bot_1.getMessages(CHAT_ID_1).then(resp => {
+                    assert.ok(is.object(resp));
+                    assert.equal(resp.messages[0].body.text, msg);
+                });
+            });
+        });
+
+        describe('#editMessage', function editMessage() {
+            let msg = 'Test #editMessage #' + utils.randomInteger();
+            it('should send test message and  edit it', function test() {
+                bot_1
+                    .sendMessage(undefined, CHAT_ID_1, undefined, {text: msg})
+                    .then(respSendMessage => {
+                        let editedMessage = msg + 'edit ' + utils.randomInteger();
+                        let midEditMessage = respSendMessage.message.body.mid;
+                        return bot_1
+                            .editMessage(midEditMessage, {text: editedMessage})
+                            .then(respEditMessage => {
+                                assert.ok(is.object(respEditMessage));
+                                assert.ok(is.true(respEditMessage.success));
+                                bot_1.getMessageById(midEditMessage).then(respGetMessageById => {
+                                    assert.ok(is.object(respGetMessageById));
+                                    assert.equal(respGetMessageById.body.text, editedMessage);
+                                });
+                            });
+                    });
+            });
+        });
+
+        describe('#deleteMessage', function deleteMessage() {
+            let msg = 'Test #deleteMessage #' + utils.randomInteger();
+            it('delete', function test() {
+                bot_1
+                    .sendMessage(undefined, CHAT_ID_1, undefined, {text: msg})
+                    .then(respSendMessage => {
+                        let midEditMessage = respSendMessage.message.body.mid;
+                        bot_1.deleteMessage(midEditMessage).then(respDeleteMessage => {
+                            assert.ok(is.object(respDeleteMessage));
+                            assert.ok(is.true(respDeleteMessage.success));
+                            bot_1.getMessageById(midEditMessage).catch(respGetMessageById => {
+                                assert.ok(is.object(respGetMessageById));
+                                assert.ok(is.equal(respGetMessageById.code, 'not.found'));
+                                assert.ok(is.equal(respGetMessageById.message, 'Message ' + midEditMessage + ' not found'));
+                            });
+                        });
+                    });
+            });
+        });
+    });
+
     describe('#subscriptions', function subscriptions() {
         const url_1 = 'http://test1.botapi.ok';
         const url_2 = 'http://test2.botapi.ok';

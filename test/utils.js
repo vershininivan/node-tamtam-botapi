@@ -22,11 +22,11 @@ exports = module.exports = {
 
 /**
  *
- * @param min
- * @param max
+ * @param {Number} min
+ * @param {Number} max
  * @returns {number}
  */
-function randomInteger(min, max) {
+function randomInteger(min = 1, max = 999) {
     let rand = min - 0.5 + Math.random() * (max - min + 1);
     rand = Math.round(rand);
     return rand;
@@ -34,7 +34,7 @@ function randomInteger(min, max) {
 
 /**
  *
- * @param token
+ * @param {String} token
  * @param {Number} chatId
  * @param {Number} userIds
  */
@@ -53,7 +53,7 @@ function isUserChatMember(token, chatId, userIds) {
 function isSubscribeOnUrl(arr, item) {
 
     function isContains(subscription) {
-        return subscription.url == item;
+        return subscription.url === item;
     }
 
     return arr.subscriptions.some(isContains);
