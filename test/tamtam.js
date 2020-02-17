@@ -323,4 +323,15 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
         });
     });
+
+    describe('#unit test', function unitTest() {
+        let longPollingUpdate = '{"updates":[{"message":{"body":{"text":"Test message"}},"update_type":"message_created"}]}';
+        let webhookUpdate = '{"message":{"body":{"text":"Test message"}},"update_type":"message_created"}';
+        describe('#polling method test', function test() {
+            it('should ', function test() {
+                bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdate));
+                bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdate));
+            });
+        });
+    });
 });

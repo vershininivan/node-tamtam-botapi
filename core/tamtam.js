@@ -264,7 +264,6 @@ class TamTamBot extends EventEmitter {
      * @param {Object} update
      */
     webhookUpdateTypeHandler(update = {}) {
-        console.log(update, _updateTypes.includes(update.update_type));
         if (update.update_type !== undefined) {
             if (_updateTypes.includes(update.update_type)) {
                 this.emit(update.update_type, update);
@@ -281,15 +280,17 @@ class TamTamBot extends EventEmitter {
      * @param {Object} update
      */
     longPollingUpdateTypeHandler(update = {}) {
-        if ((update.update_type !== undefined) || !update.updates.isArray()) {
-            let updates = update.updates;
-            updates.forEach(function (updatesElement) {
-                if (_updateTypes.includes(update.update_type)) {
-                    this.emit(updatesElement.update_type, update);
+        let _this = this;
+        if (update.updates instanceof Array) {
+            update.updates.forEach(function (updatesElement) {
+                if (_updateTypes.includes(updatesElement.update_type)) {
+                    _this.emit(updatesElement.update_type, updatesElement);
+                }  else {
+                    throw new Error('Can not find parameter \'' + update.update_type + '\' in response body');
                 }
             });
         } else {
-            throw new Error('Can not find parameter \'updates\' in response body');
+            throw new Error('\'updates\' is not instanceof Array');
         }
     }
 
@@ -625,6 +626,10 @@ class TamTamBot extends EventEmitter {
     }
 
     /**
+     * Construct message
+     * Sends answer on construction request.
+     * Answer can contain any prepared message and/or keyboard to help user interact with bot.
+     * https://dev.tamtam.chat/#operation/construct
      *
      * @param {String} sessionId
      * @param {Object} body
