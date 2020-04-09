@@ -133,7 +133,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 return bot_1.editChat(DIALOG_ID, body).catch(res => {
                     assert.ok(is.object(res));
                     assert.ok(is.equal(res.code, 'proto.payload'));
-                    assert.ok(is.equal(res.message, 'Method is available for chats only.'));
+                    assert.ok(is.equal(res.message, 'Method is not available for dialogs'));
                 });
             });
         });
@@ -161,6 +161,30 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
         });
 
+        describe('#pinSuite', function pinMessageSuite() {
+            let pinMsg = 'Test #unpinMessage #' + utils.randomInteger();
+            it('should return success: true', function test() {
+                bot_1.sendMessage(undefined, CHAT_ID_1, undefined, {text: pinMsg})
+                    .then( respSendMessage => {
+                        let midPinMessage = respSendMessage.message.body.mid;
+                        bot_1.pinMessage(CHAT_ID_1,{message_id: midPinMessage, notify: true})
+                            .then(respPinMessage => {
+                                assert.ok(is.object(respPinMessage));
+                                assert.ok(is.true(respPinMessage.success));
+                                bot_1.getPinnedMessage(CHAT_ID_1).then( respGetPinnedMsg => {
+                                    assert.ok(is.object(respGetPinnedMsg));
+                                    assert.ok(is.equal(pinMsg, respGetPinnedMsg.message.body.text));
+                                    assert.ok(is.equal(midPinMessage, respGetPinnedMsg.message.body.mid));
+                                    bot_1.unpinMessage(CHAT_ID_1).then(respUnpinMsg => {
+                                        assert.ok(is.object(respUnpinMsg));
+                                        assert.ok(is.true(respUnpinMsg.success));
+                                    });
+                                });
+                            });
+                    });
+            });
+        });
+
         describe('#getMembership', function getMembershipSuite() {
             it('should returns chat membership info for current bot', function test() {
                 return bot_1.getMembership(CHAT_ID_1).then( resp => {
@@ -173,7 +197,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 return bot_1.getMembership(DIALOG_ID).catch( resp => {
                     assert.ok(is.object(resp));
                     assert.ok(is.equal(resp.code, 'proto.payload'));
-                    assert.ok(is.equal(resp.message, 'Method is available for chats only.'));
+                    assert.ok(is.equal(resp.message, 'Method is not available for dialogs'));
                 });
             });
         });

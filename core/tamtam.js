@@ -15,6 +15,9 @@ const _methods = {
     GET_CHAT: 'getChat',
     EDIT_CHAT: 'editChat',
     SEND_ACTION: 'sendAction',
+    PIN_MESSAGE: 'pinMessage',
+    UNPIN_MESSAGE: 'unpinMessage',
+    GET_PINNED_MESSAGE: 'getPinnedMessage',
     GET_MEMBERSHIP: 'getMembership',
     LEAVE_CHAT: 'leaveChat',
     GET_ADMINS: 'getAdmins',
@@ -125,6 +128,18 @@ class TamTamBot extends EventEmitter {
             case _methods.SEND_ACTION:
                 builder.verbs = 'POST';
                 builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/actions`;
+                break;
+            case _methods.GET_PINNED_MESSAGE:
+                builder.verbs = 'GET';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/pin`;
+                break;
+            case _methods.PIN_MESSAGE:
+                builder.verbs = 'PUT';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/pin`;
+                break;
+            case _methods.UNPIN_MESSAGE:
+                builder.verbs = 'DELETE';
+                builder.url = `${this.options.baseApiUrl}/chats/${_chatId}/pin`;
                 break;
             case _methods.GET_MEMBERSHIP:
                 builder.verbs = 'GET';
@@ -392,6 +407,7 @@ class TamTamBot extends EventEmitter {
 
     /**
      * Send action
+     * Send bot action to chat
      * https://dev.tamtam.chat/#operation/sendAction
      *
      * @param {Number} chatId
@@ -402,6 +418,53 @@ class TamTamBot extends EventEmitter {
     sendAction(chatId, body, form = {}) {
         form.body = body;
         form.method = this._methodBuilder(_methods.SEND_ACTION, chatId, undefined);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     * Get pinned message
+     * Get pinned message in chat or channel.
+     * https://dev.tamtam.chat/#operation/getPinnedMessage
+     *
+     * @param {Number} chatId  
+     * @param form
+     * @returns {request.Request}
+     */
+    getPinnedMessage(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.GET_PINNED_MESSAGE, chatId, undefined);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     * Pin message
+     * Pins message in chat or channel.
+     * https://dev.tamtam.chat/#operation/pinMessage
+     *
+     * @param {Number} chatId 
+     * @param {Object} body
+     * @param form
+     * @returns {request.Request}
+     */
+    pinMessage(chatId, body, form = {}) {
+        form.body = body;
+        form.method = this._methodBuilder(_methods.PIN_MESSAGE, chatId, undefined);
+        form.query = this._buildQuery(form);
+        return TamTamBot._request({form});
+    }
+
+    /**
+     * Unpin message
+     * Unpins message in chat or channel.
+     * https://dev.tamtam.chat/#operation/unpinMessage
+     *
+     * @param {Number} chatId  
+     * @param form
+     * @returns {request.Request}
+     */
+    unpinMessage(chatId, form = {}) {
+        form.method = this._methodBuilder(_methods.UNPIN_MESSAGE, chatId, undefined);
         form.query = this._buildQuery(form);
         return TamTamBot._request({form});
     }
@@ -439,7 +502,7 @@ class TamTamBot extends EventEmitter {
     /**
      * Get chat admins
      * https://dev.tamtam.chat/#operation/getAdmins
-     * @param {Number}  chatId
+     * @param {Number} chatId
      * @param form
      * @returns {request.Request}
      */
@@ -453,6 +516,7 @@ class TamTamBot extends EventEmitter {
 
     /**
      * Get members
+     * Returns users participated in chat.
      * https://dev.tamtam.chat/#operation/getMembers
      *
      * @param {Number} chatId
