@@ -283,7 +283,7 @@ class TamTamBot extends EventEmitter {
             if (_updateTypes.includes(update.update_type)) {
                 this.emit(update.update_type, update);
             } else {
-                throw new Error('Can not find parameter \'' + update.update_type + '\' in response body');
+                throw new Error('Can not find parameter \'' + update.update_type + '\' among the supported');
             }
         } else {
             throw new Error('Can not find parameter \'update_type\' in response body');
@@ -295,15 +295,18 @@ class TamTamBot extends EventEmitter {
      * @param {Object} update
      */
     longPollingUpdateTypeHandler(update = {}) {
-        let _this = this;
         if (update.updates instanceof Array) {
             update.updates.forEach(function (updatesElement) {
-                if (_updateTypes.includes(updatesElement.update_type)) {
-                    _this.emit(updatesElement.update_type, updatesElement);
-                }  else {
-                    throw new Error('Can not find parameter \'' + update.update_type + '\' in response body');
+                if (updatesElement.update_type !== undefined) {
+                    if (_updateTypes.includes(updatesElement.update_type)) {
+                        this.emit(updatesElement.update_type, updatesElement);
+                    }  else {
+                        throw new Error('Can not find parameter \'' + update.update_type + '\' among the supported');
+                    }
+                } else {
+                    throw new Error('Can not find parameter \'update_type\' in response body');
                 }
-            });
+            }, this);
         } else {
             throw new Error('\'updates\' is not instanceof Array');
         }

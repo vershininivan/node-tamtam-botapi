@@ -349,12 +349,62 @@ describe('TamTamBotAPI', function tamtamSuite() {
     });
 
     describe('#unit test', function unitTest() {
-        let longPollingUpdate = '{"updates":[{"message":{"body":{"text":"Test message"}},"update_type":"message_created"}]}';
-        let webhookUpdate = '{"message":{"body":{"text":"Test message"}},"update_type":"message_created"}';
-        describe('#polling method test', function test() {
-            it('should ', function test() {
+        let longPollingUpdate = '{"updates":[{"message":{"body":{"text":"Test message longPolling"}},"update_type":"message_created"}]}';
+        let webhookUpdate = '{"message":{"body":{"text":"Test message webHook"}},"update_type":"message_callback"}';
+
+        let longPollingUpdateNotArray = '{"updates":{"message":{"body":{"text":"Test message longPolling"}},"update_type":"message_created"}}';
+        let longPollingUpdateWithoutUpdateType = '{"updates":[{"message":{"body":{"text":"Test message longPolling"}}}]}';
+        let longPollingUpdateTypeIsNotSupported = '{"updates":[{"message":{"body":{"text":"Test message longPolling"}},"update_type":"message"}]}';
+
+        let webhookUpdateWithoutUpdateType = '{"message":{"body":{"text":"Test message webHook"}}}';
+        let webhookUpdateTypeIsNotSupported = '{"message":{"body":{"text":"Test message webHook"}},"update_type":"message"}';
+
+        describe('#polling method positive test', function test() {
+            it('should expected true', function test() {
                 bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdate));
+                bot_1.on('message_created', updates => {
+                    assert.ok(is.equal(updates.message.body.text, 'Test message longPolling'));
+                });
+            });
+        });
+        describe('#polling method negative test, not array', function test() {
+            it('should expected true', function test() {
+                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateNotArray)), Error,'');
+            });
+        });
+        describe('#polling method negative test, without update_type', function test() {
+            it('should expected true', function test() {
+                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateWithoutUpdateType)), Error,'');
+            });
+        });
+        describe('#polling method negative test, update_type is not supported', function test() {
+            it('should expected true', function test() {
+                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateTypeIsNotSupported)), Error,'');
+            });
+        });
+
+        describe('#webhook method test', function test() {
+            it('should  expected true', function test() {
                 bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdate));
+                bot_1.on('message_callback', updates => {
+                    assert.ok(is.equal(updates.message.body.text, 'Test message webHook'));
+                });
+            });
+        });
+        describe('#webhook method negative test, without update_type', function test() {
+            it('should expected true', function test() {
+                assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateWithoutUpdateType)), Error,'');
+            });
+        });
+        describe('#webhook method negative test, update_type is not supported', function test() {
+            it('should expected true', function test() {
+                assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateTypeIsNotSupported)), Error,'');
+            });
+        });
+
+        describe('', function test() {
+            it('should ', function () {
+
             });
         });
     });
