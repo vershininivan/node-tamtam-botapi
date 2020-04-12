@@ -512,9 +512,7 @@ class TamTamBot extends EventEmitter {
     getAdmins(chatId, form = {}) {
         form.method = this._methodBuilder(_methods.GET_ADMINS, chatId, undefined);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -708,9 +706,7 @@ class TamTamBot extends EventEmitter {
         form.body = body;
         form.method = this._methodBuilder(_methods.CONSTRUCTS_MESSAGE);
         form.query = this._buildQuery(form);
-        return TamTamBot._request({
-            form
-        });
+        return TamTamBot._request({form});
     }
 
     /**
@@ -792,13 +788,11 @@ class TamTamBot extends EventEmitter {
      * @param form
      */
     getUploadUrl(type, form = {}) {
-        if (type !== undefined || !_uploadTypes.includes(type)) {
+        if (type !== undefined && _uploadTypes.includes(type)) {
             form.type = type;
             form.query = this._buildQuery(form);
             form.method = this._methodBuilder(_methods.GET_UPLOAD_URL);
-            return TamTamBot._request({
-                form
-            });
+            return TamTamBot._request({form});
         } else {
             throw new Error('Invalid parameter \`type\`. Should be one of: [photo,video,audio,file]');
         }

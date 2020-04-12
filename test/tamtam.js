@@ -6,15 +6,19 @@ const is = require('is');
 
 const TOKEN_BOT_1 = process.env.TEST_TAMTAM_BOTAPI_TOKEN_1;
 const TOKEN_BOT_2 = process.env.TEST_TAMTAM_BOTAPI_TOKEN_2;
+const TOKEN_BOT_3 = process.env.TEST_TAMTAM_BOTAPI_TOKEN_3;
 const USER_ID_BOT_1 = process.env.USER_ID_BOT_1;
 const USER_ID_BOT_2 = process.env.USER_ID_BOT_2;
 const USER_ID_BOT_3 = process.env.USER_ID_BOT_3;
 const CHAT_ID_1 = process.env.CHAT_ID_1;
 const CHAT_ID_2 = process.env.CHAT_ID_2;
+const CHAT_ID_3 = process.env.CHAT_ID_3;
 const DIALOG_ID = process.env.DIALOG_ID;
 const CHANNEL_ID = process.env.CHANNEL_ID;
 const HOST = process.env.HOST;
 const VERSION = process.env.API_VERSION;
+const CALLBACK_ID = process.env.CALLBACK_ID;
+const SESSION_ID = process.env.SESSION_ID;
 
 if (!TOKEN_BOT_1) {
     throw new Error('Bot token not provided');
@@ -23,6 +27,8 @@ if (!TOKEN_BOT_1) {
 describe('TamTamBotAPI', function tamtamSuite() {
     let bot_1;
     let bot_2;
+    let bot_3;
+
     this.retries(3);
 
     before(function beforeAll() {
@@ -38,6 +44,12 @@ describe('TamTamBotAPI', function tamtamSuite() {
             version: VERSION
         };
         bot_2 = new TamTamBotApi(config_2);
+        const config_3 = {
+            token: TOKEN_BOT_3,
+            host: HOST,
+            version: VERSION
+        };
+        bot_3 = new TamTamBotApi(config_3);
     });
 
     describe('#bots', function bots() {
@@ -222,7 +234,7 @@ describe('TamTamBotAPI', function tamtamSuite() {
             });
         });
 
-        describe('', function getMembersSuite() {
+        describe('#getMembers', function getMembersSuite() {
             it('should be one of member', function test() {
                 return bot_1.getMembers(CHAT_ID_1).then(resp => {
                     assert.ok(is.object(resp));
@@ -306,6 +318,26 @@ describe('TamTamBotAPI', function tamtamSuite() {
                     });
             });
         });
+
+        describe('#answerOnCallback', function answerOnCallback() {
+            let msg = 'Test #answerOnCallback' + utils.randomInteger();
+            it('should return success: true', function test() {
+                bot_3.answerOnCallback(CALLBACK_ID, {messages: [{text: msg}]}).then(res => {
+                    assert.ok(is.object(res));
+                    assert.ok(is.true(res.success));
+                });
+            });
+        });
+
+        describe('#constructsMessage', function constructsMessage() {
+            let msg = 'Test #constructsMessage' + utils.randomInteger();
+            it('should return success: true', function test() {
+                bot_3.constructsMessage(SESSION_ID, {messages: [{text: msg}]}).then(res => {
+                    assert.ok(is.object(res));
+                    assert.ok(is.true(res.success));
+                });
+            });
+        });
     });
 
     describe('#subscriptions', function subscriptions() {
@@ -346,6 +378,28 @@ describe('TamTamBotAPI', function tamtamSuite() {
                 });
             });
         });
+        describe('#negativeTestGetUploadUrl', function negativeTestGetUploadUrl() {
+            it('should throw error', function test() {
+                assert.throws(() => bot_1.getUploadUrl('mov'), Error,'');
+            });
+        });
+    });
+
+    describe('#getUpdate', function getUpdate() {
+        let msg = 'Test #getUpdate' + utils.randomInteger();
+        it('should return true', function test() {
+            bot_3.getUpdates(undefined, 1, undefined, undefined).then(getUpdatesInit => {
+                let marker = getUpdatesInit.marker;
+                bot_1
+                    .sendMessage(undefined, CHAT_ID_3, undefined, {text: msg})
+                    .then(
+                        bot_3.getUpdates(undefined, 1, marker, 'message_created').then( getUpdatesFinal => {
+                            assert.ok(is.object(getUpdatesFinal));
+                            assert.ok(is.equal(getUpdatesFinal.updates[0].message.body.text, msg));
+                        })
+                    );
+            });
+        });
     });
 
     describe('#unit test', function unitTest() {
@@ -359,53 +413,46 @@ describe('TamTamBotAPI', function tamtamSuite() {
         let webhookUpdateWithoutUpdateType = '{"message":{"body":{"text":"Test message webHook"}}}';
         let webhookUpdateTypeIsNotSupported = '{"message":{"body":{"text":"Test message webHook"}},"update_type":"message"}';
 
-        describe('#polling method positive test', function test() {
-            it('should expected true', function test() {
-                bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdate));
-                bot_1.on('message_created', updates => {
-                    assert.ok(is.equal(updates.message.body.text, 'Test message longPolling'));
+        describe('#polling emitter test', function pollingEmitterSuite() {
+            describe('positive test', function positiveTest() {
+                it('should expected true', function test() {
+                    bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdate));
+                    bot_1.on('message_created', updates => {
+                        assert.ok(is.equal(updates.message.body.text, 'Test message longPolling'));
+                    });
+                });
+            });
+            describe('negative test', function negativeTest() {
+                it('not array, should throw error', function test() {
+                    assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateNotArray)), Error,'');
+                });
+                it('without update_type, should throw error', function test() {
+                    assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateWithoutUpdateType)), Error,'');
+                });
+                it('update_type is not supported, should throw error', function test() {
+                    assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateTypeIsNotSupported)), Error,'');
                 });
             });
         });
-        describe('#polling method negative test, not array', function test() {
-            it('should expected true', function test() {
-                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateNotArray)), Error,'');
-            });
-        });
-        describe('#polling method negative test, without update_type', function test() {
-            it('should expected true', function test() {
-                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateWithoutUpdateType)), Error,'');
-            });
-        });
-        describe('#polling method negative test, update_type is not supported', function test() {
-            it('should expected true', function test() {
-                assert.throws(() => bot_1.longPollingUpdateTypeHandler(JSON.parse(longPollingUpdateTypeIsNotSupported)), Error,'');
-            });
-        });
 
-        describe('#webhook method test', function test() {
-            it('should  expected true', function test() {
-                bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdate));
-                bot_1.on('message_callback', updates => {
-                    assert.ok(is.equal(updates.message.body.text, 'Test message webHook'));
+        describe('#webhook emitter test', function webhookEmitterSuite() {
+            describe('positive test', function positiveTest() {
+                it('should  expected true', function test() {
+                    bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdate));
+                    bot_1.on('message_callback', updates => {
+                        assert.ok(is.equal(updates.message.body.text, 'Test message webHook'));
+                    });
                 });
             });
-        });
-        describe('#webhook method negative test, without update_type', function test() {
-            it('should expected true', function test() {
-                assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateWithoutUpdateType)), Error,'');
+            describe('without update_type, should throw error', function negativeTest() {
+                it('should expected true', function test() {
+                    assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateWithoutUpdateType)), Error,'');
+                });
+                it('update_type is not supported, should throw error', function test() {
+                    assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateTypeIsNotSupported)), Error,'');
+                });
             });
-        });
-        describe('#webhook method negative test, update_type is not supported', function test() {
-            it('should expected true', function test() {
-                assert.throws(() => bot_1.webhookUpdateTypeHandler(JSON.parse(webhookUpdateTypeIsNotSupported)), Error,'');
-            });
-        });
 
-        describe('', function test() {
-            it('should ', function () {
-
-            });
         });
     });
 });
