@@ -30,7 +30,7 @@
     "codecov": "^3.6.5",
     "is": "^3.3.0",
     "istanbul": "^0.4.5",
-    "mocha": "^6.1.4"
+    "mocha": "^10.2.0"
   },
   "repository": {
     "type": "git",
